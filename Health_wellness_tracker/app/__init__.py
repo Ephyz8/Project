@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object(config_by_name[config_name])
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///health_tracker.db'
     app.config['SQLACHEMY_TRACK_MODIFCATIONS'] = False
-    app.config['SECRET_KEY'] = 'your_secret_key'
+    app.config['SECRET_KEY'] = 'cebcacf23f96a1640f40153a4790fe32'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
     db.init_app(app)
