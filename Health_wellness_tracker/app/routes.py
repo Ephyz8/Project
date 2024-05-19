@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify
+from flask_login import login_user, login_required, logout_user, current_user
 from .models import db, User, Activity
 
 main = Blueprint('main', __name__)
@@ -53,16 +54,37 @@ def create_user():
     db.session.commit()
     return jsonify({'message': 'User created!'}), 201
 
+@main.route('/log_activity', methods=['GET', 'POST'])
+def log_activity():
+  if request.method == 'POST':
+      activity_name = request.form['activity_name']
+      duration = request.form['duration']
+      user_id = 1  # Hardcoded for simplicity, replace with actual user id from session
+      new_activity = Activity(name=activity_name, duration=duration, user_id=user_id)
+      db.session.add(new_activity)
+      db.session.commit()
+      return redirect(url_for('main.activities'))
+  return render_template('log_activity.html', title='Log Activity')
+
+"""@main.route('/activities', methods=['POST'])
+def log_activity():
+    Receives JSON data in the request body and logs a new activity for a user.
+
+    data = request.get_json()
+    new_activity = Activity(user_id=data['user_id'], activity_type=data['activity_type'], duration=data['duration'], timestamp=data['timestamp'])
+    db.session.add(new_activity)
+    db.session.commit()
+    return jsonify({'message': 'Activity logged!'}), 201
+    """
+
+
 @main.route('/activities', methods=['GET'])
 def get_activities():
     """Handles retrieving all logged activities."""
-    
+
     activities = Activity.query.all()
     return jsonify([activity.to_dict() for activity in activities]), 200
 
-
-
-
-
-
-
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))

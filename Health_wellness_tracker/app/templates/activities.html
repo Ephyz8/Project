@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Activities</h2>
+<ul class="list-group">
+    {% for activity in activities %}
+        <li class="list-group-item">
+            {{ activity.name }} - {{ activity.duration }} minutes
+        </li>
+    {% endfor %}
+</ul>
+<a class="btn btn-primary mt-3" href="{{ url_for('main.log_activity') }}">Log New Activity</a>
+{% endblock %}
