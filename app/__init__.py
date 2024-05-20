@@ -20,7 +20,7 @@ def create_app(config_name):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
     db.init_app(app)
-    migrate.init_app()
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     from .routes import main
