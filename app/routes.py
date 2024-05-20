@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from .models import db, User, Activity
+from flask_login import LoginManager
 
+login_manager = LoginManager()
 main = Blueprint('main', __name__)
 
 
