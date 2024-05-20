@@ -31,3 +31,22 @@ config_by_name = dict(
     test=TestingConfig,
     prod=ProductionConfig
 )
+
+class Config:
+    DEBUG = False
+    # Other configuration options...
+
+class ProductionConfig(Config):
+    ENV = 'production'
+    # Other production configuration options...
+
+class DevelopmentConfig(Config):
+    ENV = 'development'
+    DEBUG = True
+    # Other development configuration options...
+
+config_by_name = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    # Other configuration options...
+}
