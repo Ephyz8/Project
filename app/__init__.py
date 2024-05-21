@@ -15,18 +15,24 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///health_tracker.db'
-    app.config['SQLACHEMY_TRACK_MODIFCATIONS'] = False
+    app.config['SQLALCHEMY_TRACK_MODIFCATIONS'] = False
     app.config['SECRET_KEY'] = 'cebcacf23f96a1640f40153a4790fe32'
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
     db.init_app(app)
     migrate.init_app(app, db)
-    login_manager.init_app(app)
 
-    from .routes import main, auth, login_manager
+    from .routes import main, auth
+
     login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
     
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')
 
     return app
+
+from . import models
+
+@login_manager.user_loader
+def load_user(user_id):
+    return models.User.query.get(int(user_id))
