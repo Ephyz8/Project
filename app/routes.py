@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from .models import db, User, Activity
+from .models import User, Activity
 from werkzeug.security import generate_password_hash, check_password_hash 
+from . import db
 
 main = Blueprint('main', __name__)
 auth = Blueprint('auth', __name__)
@@ -13,6 +14,9 @@ login_manager.log_view = 'auth.login'
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    A user loader callback used to reload the user object from the user ID stored in the session.
+    """
     return User.query.get(int(user_id))
 
 @main.route('/')
@@ -86,14 +90,18 @@ def log_activity():
     db.session.commit()
     return jsonify({'message': 'Activity logged!'}), 201
     """
-
-
-@main.route('/activities', methods=['GET'])
-def get_activities():
+@main.route('/activities')
+@login_required
+def activities():
     """Handles retrieving all logged activities."""
+    user_activities = Activity.query.filter_by(user_id=current_user.id).all()
+    return render_template('activities.html', activities=user_activities)
+
+"""@main.route('/activities', methods=['GET'])
+def get_activities():
     activities = Activity.query.all()
     return jsonify([activity.to_dict() for activity in activities]), 200
-
+"""
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -131,9 +139,8 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
-@login_manager.user_loader
-def load_user(user_id):
-    """
-    A user loader callback used to reload the user object from the user ID stored in the session.
-    """
-    return User.query.get(int(user_id))
+# Main routes
+@main.route('/')
+@login_required
+def index():
+    return render_template('index.html', name=current_user.username)
