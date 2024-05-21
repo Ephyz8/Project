@@ -126,11 +126,6 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html')
-
 # Main routes
 @main.route('/dashboard')
 @login_required
