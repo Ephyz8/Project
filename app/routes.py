@@ -1,11 +1,19 @@
-from flask import Blueprint, render_template, request, jsonify
-from flask_login import login_user, login_required, logout_user, current_user
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from .models import db, User, Activity
-from flask_login import LoginManager
+from werkzeug.security import generate_password_hash, check_password_hash 
 
-login_manager = LoginManager()
 main = Blueprint('main', __name__)
+auth = Blueprint('auth', __name__)
 
+# Initialize LoginManager 
+login_manager = LoginManager()
+login_manager.log_view = 'auth.login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @main.route('/')
 def home():
@@ -83,10 +91,49 @@ def log_activity():
 @main.route('/activities', methods=['GET'])
 def get_activities():
     """Handles retrieving all logged activities."""
-
     activities = Activity.query.all()
     return jsonify([activity.to_dict() for activity in activities]), 200
 
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        existing_user = User.query.filter_by(username=username).first()
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_user or existing_email:
+            flash('Username or email already exists!', 'error')
+            return redirect(url_for('auth.register'))
+        hashed_password = generate_password_hash(password, method='sha256')
+        new_user = User(username=username, email=email, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('register.html')
+
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('main.home'))
+        flash('Login failed. Check your email and password.', 'error')
+    return render_template('login.html')
+
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('auth.login'))
+
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    A user loader callback used to reload the user object from the user ID stored in the session.
+    """
     return User.query.get(int(user_id))

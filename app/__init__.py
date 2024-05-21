@@ -17,13 +17,16 @@ def create_app(config_name):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///health_tracker.db'
     app.config['SQLACHEMY_TRACK_MODIFCATIONS'] = False
     app.config['SECRET_KEY'] = 'cebcacf23f96a1640f40153a4790fe32'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
-    from .routes import main
+    from .routes import main, auth, login_manager
+    login_manager.init_app(app)
+    
     app.register_blueprint(main)
+    app.register_blueprint(auth, url_prefix='/auth')
 
     return app
