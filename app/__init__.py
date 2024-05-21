@@ -3,8 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import config_by_name
-from .routes import main, auth
-from . import models
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -23,6 +21,8 @@ def create_app(config_name):
     db.init_app(app)
     migrate.init_app(app, db)
 
+    from .routes import main, auth
+
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     
@@ -30,6 +30,8 @@ def create_app(config_name):
     app.register_blueprint(auth, url_prefix='/auth')
 
     return app
+
+from . import models
 
 @login_manager.user_loader
 def load_user(user_id):
