@@ -1,15 +1,16 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from .models import User, Activity
-from werkzeug.security import generate_password_hash, check_password_hash 
+from werkzeug.security import generate_password_hash, check_password_hash
+from .forms import RegistrationForm, LoginForm 
 from . import db
 
 main = Blueprint('main', __name__)
 auth = Blueprint('auth', __name__)
 
-# Initialize LoginManager 
+# Initialize LoginManager
 login_manager = LoginManager()
-login_manager.log_view = 'auth.login'
+login_manager.login_view = 'auth.login'
 
 
 @login_manager.user_loader
@@ -23,8 +24,6 @@ def load_user(user_id):
 def home():
     """
     Handles the root URL ('/') and renders the home page template (index.html). 
-    Returns:
-        Response: An HTML page generated from the 'index.html' template.
     """
     return render_template('index.html')
 
@@ -32,8 +31,6 @@ def home():
 def about():
     """
     Handles the URL path '/about' and renders the about page template (about.html).
-    Returns:
-    Response: An HTML page generated from the 'about.html' template.
     """
     return render_template('about.html')
 
@@ -41,73 +38,55 @@ def about():
 def contact():
     """
     Handles the URL path '/contact' and supports both GET and POST methods.
-    - For GET requests, it renders the contact page template (contact.html).
-    - For POST requests, it processes the submitted form data and redirects to the home page.
-
-    POST Handling:
-    - Processes the form submission.
-    - Redirects the user to the home page after processing.
-
-    Returns:
-    Response: 
-    - For GET requests, an HTML page generated from the 'contact.html' template.
-    - For POST requests, a redirection to the home page.
     """
     if request.method == 'POST':
-      # Handle form submission (e.g., send an email or save to a database)
-      return redirect(url_for('main.home'))
+        # Handle form submission (e.g., send an email or save to a database)
+        return redirect(url_for('main.home'))
     return render_template('contact.html')
 
 @main.route('/users', methods=['POST'])
 def create_user():
     """Handles the creation of a new user."""
-
     data = request.get_json()
-    new_user = User(username=data['username'], email=data['email'], password=data['password'])
+    new_user = User(username=data['username'], email=data['email'], password=generate_password_hash(data['password'], method='sha256'))
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User created!'}), 201
 
 @main.route('/log_activity', methods=['GET', 'POST'])
+@login_required
 def log_activity():
-  if request.method == 'POST':
-      activity_name = request.form['activity_name']
-      duration = request.form['duration']
-      user_id = 1  # Hardcoded for simplicity, replace with actual user id from session
-      new_activity = Activity(name=activity_name, duration=duration, user_id=user_id)
-      db.session.add(new_activity)
-      db.session.commit()
-      return redirect(url_for('main.activities'))
-  return render_template('log_activity.html', title='Log Activity')
-
-"""@main.route('/activities', methods=['POST'])
-def log_activity():
-    Receives JSON data in the request body and logs a new activity for a user.
-
-    data = request.get_json()
-    new_activity = Activity(user_id=data['user_id'], activity_type=data['activity_type'], duration=data['duration'], timestamp=data['timestamp'])
-    db.session.add(new_activity)
-    db.session.commit()
-    return jsonify({'message': 'Activity logged!'}), 201
     """
+    Handles the logging of a new activity.
+    """
+    if request.method == 'POST':
+        activity_name = request.form['activity_name']
+        duration = request.form['duration']
+        new_activity = Activity(name=activity_name, duration=duration, user_id=current_user.id)
+        db.session.add(new_activity)
+        db.session.commit()
+        return redirect(url_for('main.activities'))
+    return render_template('log_activity.html', title='Log Activity')
+
 @main.route('/activities')
 @login_required
 def activities():
-    """Handles retrieving all logged activities."""
+    """
+    Handles retrieving all logged activities for the current user.
+    """
     user_activities = Activity.query.filter_by(user_id=current_user.id).all()
     return render_template('activities.html', activities=user_activities)
 
-"""@main.route('/activities', methods=['GET'])
-def get_activities():
-    activities = Activity.query.all()
-    return jsonify([activity.to_dict() for activity in activities]), 200
-"""
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+    """
+    Handles user registration.
+    """
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
         existing_user = User.query.filter_by(username=username).first()
         existing_email = User.query.filter_by(email=email).first()
         if existing_user or existing_email:
@@ -119,28 +98,44 @@ def register():
         db.session.commit()
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('auth.login'))
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+    """
+    Handles user login.
+    """
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('main.home'))
+            login_user(user, remember=True)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))
         flash('Login failed. Check your email and password.', 'error')
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @auth.route('/logout')
 @login_required
 def logout():
+    """
+    Handles user logout.
+    """
     logout_user()
     return redirect(url_for('auth.login'))
 
-# Main routes
-@main.route('/')
+@main.route('/dashboard')
 @login_required
-def index():
-    return render_template('index.html', name=current_user.username)
+def dashboard():
+    return render_template('dashboard.html')
+
+# Main routes
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    """
+    Renders the user dashboard.
+    """
+    return render_template('dashboard.html', name=current_user.username)
