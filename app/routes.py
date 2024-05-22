@@ -1,16 +1,17 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from .models import User, Activity
-from werkzeug.security import generate_password_hash, check_password_hash 
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from .models import User, Activity, HealthMetric
+from .forms import RegistrationForm, LoginForm
 from . import db
 
 main = Blueprint('main', __name__)
 auth = Blueprint('auth', __name__)
 
-# Initialize LoginManager 
+# Initialize LoginManager
 login_manager = LoginManager()
-login_manager.log_view = 'auth.login'
-
+login_manager.login_view = 'auth.login'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -22,9 +23,7 @@ def load_user(user_id):
 @main.route('/')
 def home():
     """
-    Handles the root URL ('/') and renders the home page template (index.html). 
-    Returns:
-        Response: An HTML page generated from the 'index.html' template.
+    Handles the root URL ('/') and renders the home page template (index.html).
     """
     return render_template('index.html')
 
@@ -32,8 +31,6 @@ def home():
 def about():
     """
     Handles the URL path '/about' and renders the about page template (about.html).
-    Returns:
-    Response: An HTML page generated from the 'about.html' template.
     """
     return render_template('about.html')
 
@@ -41,73 +38,116 @@ def about():
 def contact():
     """
     Handles the URL path '/contact' and supports both GET and POST methods.
-    - For GET requests, it renders the contact page template (contact.html).
-    - For POST requests, it processes the submitted form data and redirects to the home page.
-
-    POST Handling:
-    - Processes the form submission.
-    - Redirects the user to the home page after processing.
-
-    Returns:
-    Response: 
-    - For GET requests, an HTML page generated from the 'contact.html' template.
-    - For POST requests, a redirection to the home page.
     """
     if request.method == 'POST':
-      # Handle form submission (e.g., send an email or save to a database)
-      return redirect(url_for('main.home'))
+        # Handle form submission (e.g., send an email or save to a database)
+        return redirect(url_for('main.home'))
     return render_template('contact.html')
+
+@main.route('/metrics', methods=['GET'])
+@login_required
+def get_metrics():
+    metrics = HealthMetric.query.filter_by(user_id=current_user.id).all()
+    metrics_data = [{"metric_type": m.metric_type, "value": m.value, "date": m.date.strftime('%Y-%m-%d')} for m in metrics]
+    return jsonify(metrics_data), 200
+
+@main.route('/metrics', methods=['POST'])
+@login_required
+def create_metric():
+    data = request.get_json()
+    new_metric = HealthMetric(
+        user_id=current_user.id,
+        metric_type=data['metric_type'],
+        value=data['value'],
+        date=datetime.strptime(data['date'], '%Y-%m-%d') if 'date' in data else datetime.utcnow()
+    )
+    db.session.add(new_metric)
+    db.session.commit()
+    return jsonify({'message': 'Metric added successfully'}), 201
+
+@main.route('/metrics/<int:metric_id>', methods=['PUT'])
+@login_required
+def update_metric(metric_id):
+    data = request.get_json()
+    metric = HealthMetric.query.get_or_404(metric_id)
+    if metric.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized access'}), 403
+    
+    metric.metric_type = data.get('metric_type', metric.metric_type)
+    metric.value = data.get('value', metric.value)
+    metric.date = datetime.strptime(data['date'], '%Y-%m-%d') if 'date' in data else metric.date
+
+    db.session.commit()
+    return jsonify({'message': 'Metric updated successfully'}), 200
+
+@main.route('/metrics/<int:metric_id>', methods=['DELETE'])
+@login_required
+def delete_metric(metric_id):
+    metric = HealthMetric.query.get_or_404(metric_id)
+    if metric.user_id != current_user.id:
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    db.session.delete(metric)
+    db.session.commit()
+    return jsonify({'message': 'Metric deleted successfully'}), 200
 
 @main.route('/users', methods=['POST'])
 def create_user():
     """Handles the creation of a new user."""
-
     data = request.get_json()
-    new_user = User(username=data['username'], email=data['email'], password=data['password'])
+    existing_user = User.query.filter_by(username=data['username']).first()
+    existing_email = User.query.filter_by(email=data['email']).first()
+    if existing_user or existing_email:
+        return jsonify({'error': 'Username or email already exists!'}), 400
+
+    new_user = User(
+        username=data['username'], 
+        email=data['email'], 
+        password=generate_password_hash(data['password'], method='sha256')
+    )
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User created!'}), 201
 
 @main.route('/log_activity', methods=['GET', 'POST'])
+@login_required
 def log_activity():
-  if request.method == 'POST':
-      activity_name = request.form['activity_name']
-      duration = request.form['duration']
-      user_id = 1  # Hardcoded for simplicity, replace with actual user id from session
-      new_activity = Activity(name=activity_name, duration=duration, user_id=user_id)
-      db.session.add(new_activity)
-      db.session.commit()
-      return redirect(url_for('main.activities'))
-  return render_template('log_activity.html', title='Log Activity')
-
-"""@main.route('/activities', methods=['POST'])
-def log_activity():
-    Receives JSON data in the request body and logs a new activity for a user.
-
-    data = request.get_json()
-    new_activity = Activity(user_id=data['user_id'], activity_type=data['activity_type'], duration=data['duration'], timestamp=data['timestamp'])
-    db.session.add(new_activity)
-    db.session.commit()
-    return jsonify({'message': 'Activity logged!'}), 201
     """
+    Handles the logging of a new activity.
+    """
+    if request.method == 'POST':
+        activity_type = request.form['activity_type']
+        duration = request.form['duration']
+        new_activity = Activity(
+            activity_type=activity_type, 
+            duration=int(duration), 
+            user_id=current_user.id,
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(new_activity)
+        db.session.commit()
+        return redirect(url_for('main.activities'))
+    return render_template('log_activity.html', title='Log Activity')
+
 @main.route('/activities')
 @login_required
 def activities():
-    """Handles retrieving all logged activities."""
+    """
+    Handles retrieving all logged activities for the current user.
+    """
     user_activities = Activity.query.filter_by(user_id=current_user.id).all()
     return render_template('activities.html', activities=user_activities)
 
-"""@main.route('/activities', methods=['GET'])
-def get_activities():
-    activities = Activity.query.all()
-    return jsonify([activity.to_dict() for activity in activities]), 200
-"""
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+    """
+    Handles user registration.
+    """
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
         existing_user = User.query.filter_by(username=username).first()
         existing_email = User.query.filter_by(email=email).first()
         if existing_user or existing_email:
@@ -119,28 +159,85 @@ def register():
         db.session.commit()
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('auth.login'))
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+    """
+    Handles user login.
+    """
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('main.home'))
+            login_user(user, remember=True)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))
         flash('Login failed. Check your email and password.', 'error')
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @auth.route('/logout')
 @login_required
 def logout():
+    """
+    Handles user logout.
+    """
     logout_user()
     return redirect(url_for('auth.login'))
 
-# Main routes
-@main.route('/')
+# User profile management routes
+@main.route('/profile', methods=['GET'])
 @login_required
-def index():
-    return render_template('index.html', name=current_user.username)
+def get_profile():
+    user = User.query.get_or_404(current_user.id)
+    profile_data = {
+        "username": user.username,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "bio": user.bio,
+        "location": user.location,
+        "date_of_birth": user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else None
+    }
+    return jsonify(profile_data), 200
+
+@main.route('/profile', methods=['POST'])
+@login_required
+def create_or_update_profile():
+    data = request.get_json()
+    # Basic validation
+    if 'date_of_birth' in data:
+        try:
+            datetime.strptime(data['date_of_birth'], '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD.'}), 400
+
+    user = User.query.get_or_404(current_user.id)
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.bio = data.get('bio', user.bio)
+    user.location = data.get('location', user.location)
+    user.date_of_birth = datetime.strptime(data['date_of_birth'], '%Y-%m-%d') if 'date_of_birth' in data else user.date_of_birth
+
+    db.session.commit()
+    return jsonify({'message': 'Profile updated successfully'}), 200
+
+@main.route('/profile', methods=['DELETE'])
+@login_required
+def delete_profile():
+    user = User.query.get_or_404(current_user.id)
+    db.session.delete(user)
+    db.session.commit()
+    logout_user()
+    return jsonify({'message': 'Profile deleted successfully'}), 200
+
+# Main routes
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    """
+    Renders the user dashboard.
+    """
+    return render_template('dashboard.html', name=current_user.username)

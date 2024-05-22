@@ -1,17 +1,37 @@
 <!doctype html>
-<html>
-<head><title>Register</title></head>
-<body>
-  <h2>Register</h2>
-  <form method="POST">
-    <label for="username">Username:</label>
-    <input type="text" name="username" required>
-    <label for="email">Email:</label>
-    <input type="email" name="email" required>
-    <label for="password">Password:</label>
-    <input type="password" name="password" required>
-    <button type="submit">Register</button>
-  </form>
-  <a href="{{ url_for('login') }}">Login</a>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+  </head>
+  <body>
+    <div class="container">
+      <h2>Register</h2>
+      <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.username.label(class="form-control-label") }}
+          {{ form.username(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+          {{ form.email.label(class="form-control-label") }}
+          {{ form.email(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+          {{ form.password.label(class="form-control-label") }}
+          {{ form.password(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+          {{ form.confirm_password.label(class="form-control-label") }}
+          {{ form.confirm_password(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-primary btn-block") }}
+        </div>
+      </form>
+    </div>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  </body>
 </html>

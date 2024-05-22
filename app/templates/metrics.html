@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+    <title>Health Metrics</title>
+</head>
+<body>
+    <h2>Health Metrics</h2>
+    <form id="metric-form">
+        <label for="metric_type">Metric Type:</label>
+        <input type="text" name="metric_type" required>
+        <label for="value">Value:</label>
+        <input type="number" step="any" name="value" required>
+        <label for="date">Date:</label>
+        <input type="date" name="date">
+        <button type="submit">Add Metric</button>
+    </form>
+
+    <ul id="metrics-list"></ul>
+
+    <script>
+        document.getElementById('metric-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
+            fetch('/metrics', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json())
+              .then(data => {
+                  console.log(data);
+                  location.reload();
+              });
+        });
+
+        fetch('/metrics').then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('metrics-list');
+                data.forEach(metric => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${metric.metric_type}: ${metric.value} (${metric.date})`;
+                    list.appendChild(listItem);
+                });
+            });
+    </script>
+</body>
+</html>
