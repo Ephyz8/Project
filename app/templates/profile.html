@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <title>User Profile</title>
+</head>
+<body>
+  <h2>User Profile</h2>
+  <form id="profileForm" method="POST">
+    <label for="first_name">First Name:</label>
+    <input type="text" id="first_name" name="first_name">
+    <br>
+    <label for="last_name">Last Name:</label>
+    <input type="text" id="last_name" name="last_name">
+    <br>
+    <label for="bio">Bio:</label>
+    <textarea id="bio" name="bio"></textarea>
+    <br>
+    <label for="location">Location:</label>
+    <input type="text" id="location" name="location">
+    <br>
+    <label for="date_of_birth">Date of Birth:</label>
+    <input type="date" id="date_of_birth" name="date_of_birth">
+    <br>
+    <button type="submit">Save Profile</button>
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/profile')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('first_name').value = data.first_name || '';
+          document.getElementById('last_name').value = data.last_name || '';
+          document.getElementById('bio').value = data.bio || '';
+          document.getElementById('location').value = data.location || '';
+          document.getElementById('date_of_birth').value = data.date_of_birth || '';
+        });
+
+      document.getElementById('profileForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const data = {
+          first_name: document.getElementById('first_name').value,
+          last_name: document.getElementById('last_name').value,
+          bio: document.getElementById('bio').value,
+          location: document.getElementById('location').value,
+          date_of_birth: document.getElementById('date_of_birth').value,
+        };
+
+        fetch('/profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
