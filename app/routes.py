@@ -51,6 +51,16 @@ def get_metrics():
     metrics_data = [{"metric_type": m.metric_type, "value": m.value, "date": m.date.strftime('%Y-%m-%d')} for m in metrics]
     return jsonify(metrics_data), 200
 
+@main.route('/metrics_data')
+@login_required
+def metrics_data():
+    metrics = HealthMetric.query.filter_by(user_id=current_user.id).all()
+    metrics_data = {
+        'labels': [m.date.strftime('%Y-%m-%d') for m in metrics],
+        'values': [m.value for m in metrics]
+    }
+    return jsonify(metrics_data)
+
 @main.route('/metrics', methods=['POST'])
 @login_required
 def create_metric():
