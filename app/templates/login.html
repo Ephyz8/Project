@@ -1,4 +1,4 @@
-<!doctype html>
+<!-- <!doctype html>
 <html>
 <head><title>Login</title></head>
 <body>
@@ -13,3 +13,18 @@
   <a href="{{ url_for('register') }}">Register</a>
 </body>
 </html>
+-->
+
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Login</h2>
+  <form method="POST">
+    <label for="email">Email:</label>
+    <input type="email" name="email" required>
+    <label for="password">Password:</label>
+    <input type="password" name="password" required>
+    <button type="submit">Login</button>
+  </form>
+  <a href="{{ url_for('register') }}">Register</a>
+{% endblock %}
