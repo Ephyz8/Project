@@ -111,8 +111,8 @@ def create_user():
         return jsonify({'error': 'Username or email already exists!'}), 400
 
     new_user = User(
-        username=data['username'], 
-        email=data['email'], 
+        username=data['username'],
+        email=data['email'],
         password=generate_password_hash(data['password'], method='sha256')
     )
     db.session.add(new_user)
