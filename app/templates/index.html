@@ -1,43 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="jumbotron text-center">
+<!-- Hero Section -->
+<section class="hero bg-primary text-white text-center py-5">
+    <div class="container">
         <h1 class="display-4">Welcome to HealthTrack</h1>
-        <p class="lead">Your health and wellness tracker</p>
-        <hr class="my-4">
-        <p>Track your activities and health metrics easily and efficiently.</p>
-        <a class="btn btn-primary btn-lg" href="{{ url_for('main.about') }}" role="button">Learn more</a>
-        <a class="btn btn-secondary btn-lg" href="{{ url_for('main.contact') }}" role="button">Contact Us</a>
+        <p class="lead">Your comprehensive health and wellness tracker</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">Get Started</a>
     </div>
-    <div>
-        <canvas id="myChart" width="400" height="200"></canvas>
-    </div>
-</div>
+</section>
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Health Metrics Over Time',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
-</script>
-{% endblock %}
+<!-- Features Section -->
+<section class="features py-5">
+    <div class="container">
+        <h2 class="text-center">Features</h2>
+        <div class="row mt-4">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-heartbeat fa-3x text-primary"></i>
+                <h3>Health Metrics</h3>
+                <p>Track various health metrics like weight, blood pressure, and physical activity.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-chart-line fa-3x text-primary"></i>
+                <h3>Data Visualization</h3>
+                <p>Visualize your health data with interactive charts to identify trends and make informed decisions.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-user-shield fa-3x text-primary"></i>
+                <h3>Privacy & Security</h3>
+                <p>Your data is securely stored and protected, ensuring your privacy and confidentiality.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials bg-light py-5">
+    <div class="container">
+        <h2 class="text-center">Testimonials</h2>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">"HealthTrack has been a game-changer for me. It's so easy to use and helps me keep track of my health metrics seamlessly."</p>
+                        <h5 class="card-title">- Sarah K.</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">"The data visualization tools are fantastic. I can easily see my progress over time and stay motivated."</p>
+                        <h5 class="card-title">- John D.</h5>
+                    </div>

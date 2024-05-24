@@ -1,68 +1,24 @@
-/* General styles */
 body {
   padding-top: 56px;
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
 }
 
-/* Container styling */
 .container {
   margin-top: 30px;
 }
 
-/* Navbar styling */
-.navbar {
-  background-color: #007bff;
+.hero {
+  background: url('https://source.unsplash.com/1600x900/?health,fitness') no-repeat center center;
+  background-size: cover;
 }
 
-.navbar .navbar-brand,
-.navbar .nav-link {
-  color: #fff !important;
+.features .col-md-4 {
+  margin-top: 30px;
 }
 
-.navbar .nav-link:hover {
-  color: #dfe6e9 !important;
+.testimonials .card {
+  margin-top: 30px;
 }
 
-/* Header styling */
-h1 {
-  color: #007bff;
-  margin-bottom: 20px;
-}
-
-/* Button styling */
-.btn-custom {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.btn-custom:hover {
-  background-color: #0056b3;
-  color: #fff;
-}
-
-/* Card styling */
-.card {
-  margin-top: 20px;
-}
-
-.card-header {
-  background-color: #007bff;
-  color: #fff;
-}
-
-/* Chart container styling */
-#myChart {
-  margin-top: 20px;
-}
-
-/* Footer styling */
-footer {
-  background-color: #007bff;
-  color: #fff;
-  padding: 20px 0;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
+.cta {
+  background: linear-gradient(to right, #4b79a1, #283e51);
 }
