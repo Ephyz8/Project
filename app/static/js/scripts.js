@@ -1,5 +1,6 @@
 // Add any custom JavaScript code here
 console.log("Custom scripts loaded.");
+
 document.addEventListener('DOMContentLoaded', function() {
   fetch('/metrics_data')
       .then(response => response.json())
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   }]
               },
               options: {
+                  responsive: true,
                   scales: {
                       y: {
                           beginAtZero: true

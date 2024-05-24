@@ -1,28 +1,43 @@
-<!--<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <h1>Welcome to HealthTrack</h1>
-    <p>Your health and wellness tracker</p>
-    <a href="{{ url_for('main.about') }}">About</a>
-    <a href="{{ url_for('main.contact') }}">Contact</a>
-</body>
-</html>
--->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Welcome to HealthTrack</h1>
-    <p>Your health and wellness tracker</p>
-    <a href="{{ url_for('main.about') }}">About</a>
-    <a href="{{ url_for('main.contact') }}">Contact</a>
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Welcome to HealthTrack</h1>
+        <p class="lead">Your health and wellness tracker</p>
+        <hr class="my-4">
+        <p>Track your activities and health metrics easily and efficiently.</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('main.about') }}" role="button">Learn more</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('main.contact') }}" role="button">Contact Us</a>
+    </div>
     <div>
         <canvas id="myChart" width="400" height="200"></canvas>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'Health Metrics Over Time',
+                    data: [65, 59, 80, 81, 56, 55, 40],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
