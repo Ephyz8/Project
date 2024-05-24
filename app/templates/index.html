@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-body">
                         <p class="card-text">"HealthTrack has been a game-changer for me. It's so easy to use and helps me keep track of my health metrics seamlessly."</p>
-                        <h5 class="card-title">- Marvel Ireen Makina.</h5>
+                        <h5 class="card-title">- Marvel Ireen Makina</h5>
                     </div>
                 </div>
             </div>
@@ -51,15 +51,15 @@
                 <div class="card">
                     <div class="card-body">
                         <p class="card-text">"The data visualization tools are fantastic. I can easily see my progress over time and stay motivated."</p>
-                        <h5 class="card-title">- Ephraim Inkosi Ziwoya.</h5>
+                        <h5 class="card-title">- Ephraim Ziwoya</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <p class="card-text">"I love the personalized insights that HealthTrack provides. It really helps me understand my health better."</p>
-                        <h5 class="card-title">- Lucy.</h5>
+                        <p class="card-text">"I love the privacy and security features. I feel confident that my personal health data is safe with HealthTrack."</p>
+                        <h5 class="card-title">- Lucy</h5>
                     </div>
                 </div>
             </div>
@@ -68,44 +68,12 @@
 </section>
 
 <!-- Call to Action Section -->
-<section class="cta py-5 text-white text-center" style="background-color: #007bff;">
+<section class="cta bg-primary text-white text-center py-5">
     <div class="container">
-        <h2>Ready to take control of your health?</h2>
-        <p class="lead">Join HealthTrack today and start your journey towards a healthier life.</p>
+        <h2 class="display-4">Start Your Health Journey Today</h2>
+        <p class="lead">Join our community and take control of your wellness with HealthTrack.</p>
         <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">Sign Up Now</a>
     </div>
 </section>
 
-<!-- Chart Section -->
-<div class="container mt-5">
-    <div>
-        <canvas id="myChart" width="400" height="200"></canvas>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Health Metrics Over Time',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
-</script>
 {% endblock %}

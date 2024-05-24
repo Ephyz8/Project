@@ -7,32 +7,18 @@ body {
 }
 
 .hero {
-  background: url('/static/images/hero-bg.jpg') no-repeat center center;
+  background: url('https://source.unsplash.com/1600x900/?health,fitness') no-repeat center center;
   background-size: cover;
-  color: white;
-  padding: 100px 0;
 }
 
-.features {
-  background: #f8f9fa;
-}
-
-.features .fa {
-  margin-bottom: 20px;
+.features .col-md-4 {
+  margin-top: 30px;
 }
 
 .testimonials .card {
-  border: none;
-  background-color: #f8f9fa;
-}
-
-.testimonials .card-body {
-  padding: 20px;
-  background: white;
-  border-radius: 5px;
+  margin-top: 30px;
 }
 
 .cta {
-  background: #007bff;
-  color: white;
+  background: linear-gradient(to right, #4b79a1, #283e51);
 }
