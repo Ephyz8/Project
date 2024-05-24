@@ -1,14 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
     <h1>About HealthTrack</h1>
-    <p>HealthTrack is a web application designed to help you track your health and wellness activities.</p>
-    <a href="{{ url_for('main.home') }}">Home</a>
-    <a href="{{ url_for('main.contact') }}">Contact</a>
-</body>
-</html>
+    <p class="lead">Your comprehensive health and wellness tracking companion.</p>
+    <p>HealthTrack is a state-of-the-art web application designed to empower you on your journey to a healthier life. Our mission is to provide you with the tools and insights necessary to monitor and improve your physical and mental well-being.</p>
+    
+    <h3>Key Features</h3>
+    <ul>
+        <li><strong>Health Metrics Tracking:</strong> Easily log and track various health metrics such as weight, blood pressure, and physical activity.</li>
+        <li><strong>Data Visualization:</strong> Visualize your health data with interactive charts to identify trends and make informed decisions.</li>
+        <li><strong>Personalized Insights:</strong> Receive personalized health insights based on your data to help you achieve your wellness goals.</li>
+        <li><strong>Secure and Private:</strong> Your data is securely stored and protected, ensuring your privacy and confidentiality.</li>
+    </ul>
+    
+    <h3>Why Choose HealthTrack?</h3>
+    <p>HealthTrack is more than just a tracker; it's your personal health assistant. With our user-friendly interface and advanced analytics, you can stay on top of your health with minimal effort. Whether you're looking to lose weight, manage a chronic condition, or simply live a healthier life, HealthTrack is here to support you every step of the way.</p>
+    
+    <p>Join our community of health-conscious individuals and take control of your wellness journey today!</p>
+    
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary">Home</a>
+    <a href="{{ url_for('main.contact') }}" class="btn btn-secondary">Contact</a>
+</div>
+{% endblock %}
