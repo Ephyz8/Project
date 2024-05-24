@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import config_by_name
+from flask_cors import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -20,14 +21,18 @@ def create_app(config_name):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    CORS(app)
 
     from .routes import main, auth
+    from app.api import api as api_blueprint
 
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(api_blueprint, url_prefix='/api')
+
 
     return app
 
