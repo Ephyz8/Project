@@ -7,7 +7,7 @@ from .forms import RegistrationForm, LoginForm
 from . import db
 
 main = Blueprint('main', __name__)
-auth = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 # Initialize LoginManager
 login_manager = LoginManager()
