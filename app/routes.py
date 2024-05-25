@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from .models import User, Activity, HealthMetric
 from .forms import RegistrationForm, LoginForm
-from . import db
+from . import db, auth
 
 main = Blueprint('main', __name__)
 auth = Blueprint('auth', __name__)
