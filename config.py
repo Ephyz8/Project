@@ -1,35 +1,27 @@
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 class Config:
-    """Base configuration."""
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'cebcacf23f96a1640f40153a4790fe32')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'cebcacf23f96a1640f40153a4790fe32')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///health_tracker.db')
+
+    @staticmethod
+    def init_app(app):
+        pass
 
 class DevelopmentConfig(Config):
-    """Development configuration."""
     DEBUG = True
 
 class TestingConfig(Config):
-    """Testing configuration."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///health_tracker_test.db'
 
 class ProductionConfig(Config):
-    """Production configuration."""
-    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///health_tracker.db')
 
-# Dictionary to map the environment name to the config class
-config_by_name = {
-    'dev': DevelopmentConfig,
-    'test': TestingConfig,
-    'prod': ProductionConfig,
+config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'production': ProductionConfig
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
 }
