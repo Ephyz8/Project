@@ -1,35 +1,40 @@
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 class Config:
-    """Base configuration."""
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'cebcacf23f96a1640f40153a4790fe32')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///health_tracker.db')
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_secret_key'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    DEBUG = True
+
+    # Configure logging
+    @staticmethod
+    def init_app(app):
+        import logging
+        from logging.handlers import RotatingFileHandler
+        
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        
+        file_handler = RotatingFileHandler('logs/your_flask_app.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('YourFlaskApp startup')
 
 class DevelopmentConfig(Config):
-    """Development configuration."""
     DEBUG = True
 
 class TestingConfig(Config):
-    """Testing configuration."""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-    DEBUG = True
 
 class ProductionConfig(Config):
-    """Production configuration."""
-    DEBUG = False
+    pass
 
-# Dictionary to map the environment name to the config class
-config_by_name = {
-    'dev': DevelopmentConfig,
-    'test': TestingConfig,
-    'prod': ProductionConfig,
+config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'production': ProductionConfig
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
 }
