@@ -3,7 +3,7 @@ from app.models import User, Activity, HealthMetric
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 
-app = create_app('dev')
+app = create_app('production')
 
 def create_initial_data():
     with app.app_context():

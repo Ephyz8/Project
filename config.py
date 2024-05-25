@@ -6,7 +6,7 @@ load_dotenv()
 class Config:
     """Base configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'cebcacf23f96a1640f40153a4790fe32')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///health_tracker.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = True
 
