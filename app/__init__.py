@@ -20,8 +20,7 @@ def create_app(config_name):
     migrate.init_app(app, db)
     CORS(app)
 
-    from .routes import main
-    from . import auth
+    from .routes import main, auth
 
     login_manager.init_app(app)
 

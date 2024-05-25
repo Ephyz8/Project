@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from .models import User, Activity, HealthMetric
 from .forms import RegistrationForm, LoginForm
-from . import db, auth
+from . import db
 
 main = Blueprint('main', __name__)
 auth = Blueprint('auth', __name__)
@@ -175,7 +175,7 @@ def register():
             app.logger.error(f"Error adding user: {e}")
             flash('Error: Unable to register user. Please try again.')
             return redirect(url_for('auth.register'))
-    return render_template('register.html', form=form)
+    return render_template('auth/register.html', form=form)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
