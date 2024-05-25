@@ -175,7 +175,7 @@ def register():
             app.logger.error(f"Error adding user: {e}")
             flash('Error: Unable to register user. Please try again.')
             return redirect(url_for('auth.register'))
-    return render_template('auth/register.html', form=form)
+    return render_template('register.html', form=form)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
