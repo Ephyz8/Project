@@ -1,7 +1,9 @@
+import os
+from config import config
 from app import create_app
-from config import config_by_name
 
-app = create_app('production')
+config_name = os.getenv('FLASK_CONFIG', 'default')
+app = create_app(config_name)
 
 if __name__ == "__main__":
     app.run()
