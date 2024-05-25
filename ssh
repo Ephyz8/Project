@@ -6,7 +6,7 @@ source venv/bin/activate
 
 pip freeze > requirements.txt
 
- # Configure logging
+''' # Configure logging
     @staticmethod
     def init_app(app):
         import logging
@@ -23,3 +23,4 @@ pip freeze > requirements.txt
         app.logger.addHandler(file_handler)
         app.logger.setLevel(logging.INFO)
         app.logger.info('YourFlaskApp startup')
+'''
