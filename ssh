@@ -5,3 +5,21 @@ ssh 9ef60d7ad78b@9ef60d7ad78b.2eaa3951.alx-cod.online
 source venv/bin/activate
 
 pip freeze > requirements.txt
+
+ # Configure logging
+    @staticmethod
+    def init_app(app):
+        import logging
+        from logging.handlers import RotatingFileHandler
+        
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        
+        file_handler = RotatingFileHandler('logs/your_flask_app.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('YourFlaskApp startup')

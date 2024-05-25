@@ -1,36 +1,23 @@
 import os
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'your_secret_key'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
+    SECRET_KEY = os.getenv('SECRET_KEY', 'cebcacf23f96a1640f40153a4790fe32')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///health_tracker.db')
 
-    # Configure logging
     @staticmethod
     def init_app(app):
-        import logging
-        from logging.handlers import RotatingFileHandler
-        
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        
-        file_handler = RotatingFileHandler('logs/your_flask_app.log', maxBytes=10240, backupCount=10)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
-        app.logger.setLevel(logging.INFO)
-        app.logger.info('YourFlaskApp startup')
+        pass
 
 class DevelopmentConfig(Config):
     DEBUG = True
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///health_tracker_test.db'
 
 class ProductionConfig(Config):
-    pass
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///health_tracker.db')
 
 config = {
     'development': DevelopmentConfig,

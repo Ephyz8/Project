@@ -21,13 +21,11 @@ def create_app(config_name):
     CORS(app)
 
     from .routes import main, auth
-    # from app.api import api as api_blueprint
 
     login_manager.init_app(app)
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')
-    # app.register_blueprint(api_blueprint, url_prefix='/api')
 
     return app
 
