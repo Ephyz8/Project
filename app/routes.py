@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app as app
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -165,10 +165,16 @@ def register():
             return redirect(url_for('auth.register'))
         hashed_password = generate_password_hash(password, method='sha256')
         new_user = User(username=username, email=email, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('auth.login'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('auth.login'))
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error adding user: {e}")
+            flash('Error: Unable to register user. Please try again.')
+            return redirect(url_for('auth.register'))
     return render_template('register.html', form=form)
 
 @auth.route('/login', methods=['GET', 'POST'])
