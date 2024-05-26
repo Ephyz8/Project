@@ -8,7 +8,6 @@ from config import config
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
 
 def create_app(config_name):
     """Creates and configures an instance of the Flask application."""
@@ -23,6 +22,7 @@ def create_app(config_name):
     from .routes import main, auth
 
     login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
 
     app.register_blueprint(main)
     app.register_blueprint(auth, url_prefix='/auth')

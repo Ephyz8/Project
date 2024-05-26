@@ -3,17 +3,18 @@ from app.models import User, Activity, HealthMetric
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 
-app = create_app('production')
+def seed():
+    app = create_app('production')
 
-def create_initial_data():
     with app.app_context():
         db.drop_all()
         db.create_all()
+
     # Create sample user
     user1 = User(
         username='testuser',
         email='test@example.com',
-        password=generate_password_hash('password', method='sha256')
+        password=generate_password_hash('password', method='pbkdf2:sha256')
     )
 
     db.session.add(user1)
@@ -55,6 +56,7 @@ def create_initial_data():
     db.session.add(metric2)
     db.session.commit()
 
+    print('Database seeded successfully!')
 
 if __name__ == '__main__':
-    create_initial_data()
+    seed()

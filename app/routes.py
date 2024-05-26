@@ -163,7 +163,7 @@ def register():
         if existing_user or existing_email:
             flash('Username or email already exists!', 'error')
             return redirect(url_for('auth.register'))
-        hashed_password = generate_password_hash(password, method='sha256')
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = User(username=username, email=email, password=hashed_password)
         try:
             db.session.add(new_user)
