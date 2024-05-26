@@ -1,8 +1,9 @@
 ssh 9ef60d7ad78b@9ef60d7ad78b.2eaa3951.alx-cod.online
 
-954214f45d96ae708ad4
-
+90054214f45d96ae708ad4
+python -m venv env 
 source venv/bin/activate
+deactivate
 
 pip freeze > requirements.txt
 
