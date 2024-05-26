@@ -3,15 +3,21 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_cors import CORS
+from dotenv import load_dotenv
 from config import config
+
+load_dotenv()
 
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 
+
 def create_app(config_name):
     """Creates and configures an instance of the Flask application."""
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=True)
+    app.config['SECRET KEY'] = 'secret-key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///health_tracker.db'
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     

@@ -148,61 +148,6 @@ def activities():
     user_activities = Activity.query.filter_by(user_id=current_user.id).all()
     return render_template('activities.html', activities=user_activities)
 
-@auth.route('/register', methods=['GET', 'POST'])
-def register():
-    """
-    Handles user registration.
-    """
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        email = form.email.data
-        password = form.password.data
-        existing_user = User.query.filter_by(username=username).first()
-        existing_email = User.query.filter_by(email=email).first()
-        if existing_user or existing_email:
-            flash('Username or email already exists!', 'error')
-            return redirect(url_for('auth.register'))
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-        new_user = User(username=username, email=email, password=hashed_password)
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('auth.login'))
-        except Exception as e:
-            db.session.rollback()
-            app.logger.error(f"Error adding user: {e}")
-            flash('Error: Unable to register user. Please try again.')
-            return redirect(url_for('auth.register'))
-    return render_template('register.html', form=form)
-
-@auth.route('/login', methods=['GET', 'POST'])
-def login():
-    """
-    Handles user login.
-    """
-    form = LoginForm()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        user = User.query.filter_by(email=email).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user, remember=True)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.home'))
-        flash('Login failed. Check your email and password.', 'error')
-    return render_template('login.html', form=form)
-
-@auth.route('/logout')
-@login_required
-def logout():
-    """
-    Handles user logout.
-    """
-    logout_user()
-    return redirect(url_for('auth.login'))
-
 # User profile management routes
 @main.route('/profile', methods=['GET'])
 @login_required
@@ -257,3 +202,58 @@ def dashboard():
     Renders the user dashboard.
     """
     return render_template('dashboard.html', name=current_user.username)
+
+@auth.route('/register', methods=['GET', 'POST'])
+def register():
+    """
+    Handles user registration.
+    """
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        existing_user = User.query.filter_by(username=username).first()
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_user or existing_email:
+            flash('Username or email already exists!', 'error')
+            return redirect(url_for('auth.register'))
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        new_user = User(username=username, email=email, password=hashed_password)
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('auth.login'))
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error adding user: {e}")
+            flash('Error: Unable to register user. Please try again.')
+            return redirect(url_for('auth.register'))
+    return render_template('register.html', form=form)
+
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    """
+    Handles user login.
+    """
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user, remember=True)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+        flash('Login failed. Check your email and password.', 'error')
+    return render_template('login.html', form=form)
+
+@auth.route('/logout')
+@login_required
+def logout():
+    """
+    Handles user logout.
+    """
+    logout_user()
+    return redirect(url_for('auth.login'))
