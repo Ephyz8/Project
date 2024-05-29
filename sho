@@ -1,4 +1,4 @@
-ssh 9ef60d7ad78b@9ef60d7ad78b.2eaa3951.alx-cod.online
+'''ssh 9ef60d7ad78b@9ef60d7ad78b.2eaa3951.alx-cod.online
 
 90054214f45d96ae708ad4
 python -m venv env 
@@ -7,7 +7,7 @@ deactivate
 
 pip freeze > requirements.txt
 
-''' # Configure logging
+  # Configure logging
     @staticmethod
     def init_app(app):
         import logging
