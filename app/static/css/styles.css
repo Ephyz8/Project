@@ -1,24 +1,91 @@
+/* styles.css */
+
+/* General Styles */
 body {
-  padding-top: 56px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.container {
-  margin-top: 30px;
+.section-title {
+  margin-bottom: 1.5rem;
+  font-weight: bold;
 }
 
+/* Hero Section */
 .hero {
   background: url('https://source.unsplash.com/1600x900/?health,fitness') no-repeat center center;
   background-size: cover;
+  color: white;
+  padding: 5rem 0;
 }
 
-.features .col-md-4 {
-  margin-top: 30px;
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.hero .btn {
+  margin-top: 1.5rem;
+}
+
+/* Features Section */
+.features {
+  padding: 5rem 0;
+}
+
+.features .fa-3x {
+  margin-bottom: 1rem;
+}
+
+.features h3 {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Testimonials Section */
+.testimonials {
+  padding: 5rem 0;
+  background-color: #f8f9fa; /* Light background */
 }
 
 .testimonials .card {
-  margin-top: 30px;
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
+.testimonials .card-body {
+  padding: 1.5rem;
+}
+
+.testimonials .card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+/* Call to Action Section */
 .cta {
-  background: linear-gradient(to right, #4b79a1, #283e51);
+  background: #007bff; /* Primary color */
+  color: white;
+  padding: 5rem 0;
+}
+
+.cta h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.cta .btn {
+  margin-top: 1.5rem;
+}
+
+/* Footer */
+.footer {
+  background: #f8f9fa; /* Light background */
+  padding: 1.5rem 0;
+}
+
+.footer .text-muted {
+  color: #6c757d !important; /* Override color for text-muted */
 }

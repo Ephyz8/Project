@@ -3,7 +3,10 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Register</h2>
-    <form action="#" method="POST">
+    <form action="{{ url_for('auth.register') }}" method="POST">
+         <!-- Include CSRF token -->
+        {{ form.csrf_token() }}
+
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.username.label(class="form-control-label") }}
@@ -15,7 +18,7 @@
         </div>
         <div class="form-group">
             {{ form.password.label(class="form-control-label") }}
-            {{ form.password(class="form-control form-control-lg") }}
+            {{ form.password(class="form-control form-cont rol-lg") }}
         </div>
         <div class="form-group">
             {{ form.confirm_password.label(class="form-control-label") }}

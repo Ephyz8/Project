@@ -2,6 +2,8 @@
 {% block content %}
 <h2>Log Activity</h2>
 <form method="post" action="{{ url_for('main.log_activity') }}">
+     <!-- Include CSRF token -->
+     {{ form.csrf_token() }}
     <div class="form-group">
         <label for="activity_name">Activity Name</label>
         <input type="text" class="form-control" id="activity_name" name="activity_name" required>
