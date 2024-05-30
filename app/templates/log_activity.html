@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center">Log Activity</h1>
-    <form method="POST" action="{{ url_for('log_activity') }}">
+    <form method="POST" action="{{ url_for('auth.log_activity') }}">
         <div class="form-group">
             <label for="steps">Steps</label>
             <input type="number" class="form-control" id="steps" name="steps" required>
