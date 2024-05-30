@@ -3,7 +3,7 @@ from flask_login import login_required, logout_user, current_user
 from datetime import datetime, timedelta
 from .models import User, Activity, Nutrition, Sleep, Mood
 from . import db
-from .forms import ProfileForm, ContactForm
+from .forms import ProfileForm, ContactForm, MoodForm
 import json
 
 main = Blueprint('main', __name__)
@@ -72,19 +72,23 @@ def log_sleep():
     db.session.commit()
     return jsonify({'message': 'Sleep logged successfully'}), 201
 
-@main.route('/mood', methods=['POST'])
+@main.route('/mood', methods=['GET', 'POST'])
 @login_required
 def log_mood():
-    data = request.get_json()
-    new_mood = Mood(
-        user_id=current_user.id,
-        mood=data['mood'],
-        note=data['note'],
-        date=datetime.strptime(data['date'], '%Y-%m-%d') if 'date' in data else datetime.utcnow()
-    )
-    db.session.add(new_mood)
-    db.session.commit()
-    return jsonify({'message': 'Mood logged successfully'}), 201
+    form = MoodForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        data = request.form
+        new_mood = Mood(
+            user_id=current_user.id,
+            mood=data['mood'],
+            note=data['note'],
+            date=datetime.utcnow()
+        )
+        db.session.add(new_mood)
+        db.session.commit()
+        flash('Mood logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_mood.html', form=form)
 
 @main.route('/profile', methods=['GET'])
 @login_required
@@ -174,7 +178,8 @@ def log_activity():
     db.session.commit()
     return jsonify({'message': 'Activity logged successfully'}), 201
 
-@main.route('/activity_data', methods=['POST'])
+# Update the following endpoints to allow GET requests
+@main.route('/activity_data', methods=['GET'])
 @login_required
 def activity_data():
     period = request.args.get('period', 'daily')
@@ -189,18 +194,21 @@ def activity_data():
     } for a in activities]
     return jsonify(activity_data), 200
 
-@main.route('/nutrition_data', methods=['POST'])
+@main.route('/nutrition_data', methods=['GET'])
 @login_required
 def nutrition_data():
     period = request.args.get('period', 'daily')
     nutritions = get_nutritions_by_period(current_user.id, period)
-    calories = sum(n.calories for n in nutritions)
-    protein = sum(n.protein for n in nutritions)
-    carbs = sum(n.carbs for n in nutritions)
-    fats = sum(n.fats for n in nutritions)
-    return jsonify({"calories": calories, "protein": protein, "carbs": carbs, "fats": fats}), 200
+    nutrition_data = [{
+        "calories": n.calories,
+        "protein": n.protein,
+        "carbs": n.carbs,
+        "fats": n.fats,
+        "date": n.date.strftime('%Y-%m-%d')
+    } for n in nutritions]
+    return jsonify(nutrition_data), 200
 
-@main.route('/sleep_data', methods=['POST'])
+@main.route('/sleep_data', methods=['GET'])
 @login_required
 def sleep_data():
     period = request.args.get('period', 'daily')
@@ -212,7 +220,7 @@ def sleep_data():
     } for s in sleeps]
     return jsonify(sleep_data), 200
 
-@main.route('/mood_data', methods=['POST'])
+@main.route('/mood_data', methods=['GET'])
 @login_required
 def mood_data():
     period = request.args.get('period', 'daily')

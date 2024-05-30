@@ -122,6 +122,7 @@ class Mood(db.Model):
     """
     Defines a Mood class that inherits from db.Model, making it a model class for SQLAlchemy.
     """
+    mood = db.Column(db.String(50), nullable=False)
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     date = db.Column(db.Date, nullable=False, default=datetime.utcnow)

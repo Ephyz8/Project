@@ -28,17 +28,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to fetch data and initialize charts
 function fetchDataAndDisplay(apiEndpoint, canvasId, chartLabel, yAxisLabel) {
-  fetch(apiEndpoint)
+  fetch(apiEndpoint, { method: 'POST' })
     .then(response => response.json())
     .then(data => {
+      const labels = data.map(item => item.date || item.timestamp);
+      const values = data.map(item => {
+        if (apiEndpoint === '/nutrition_data') {
+          return item.calories;
+        } else if (apiEndpoint === '/sleep_data') {
+          return item.hours;
+        } else if (apiEndpoint === '/mood_data') {
+          return item.mood;
+        } else if (apiEndpoint === '/activity_data') {
+          return item.steps;
+        }
+      });
+
       const ctx = document.getElementById(canvasId).getContext('2d');
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: data.labels,
+          labels: labels,
           datasets: [{
             label: chartLabel,
-            data: data.values,
+            data: values,
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 1,
