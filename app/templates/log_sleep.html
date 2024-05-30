@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Log Sleep</h1>
+    <form method="POST" action="{{ url_for('main.log_sleep') }}">
+        <div class="form-group">
+            <label for="hours">Hours</label>
+            <input type="number" class="form-control" id="hours" name="hours" required>
+        </div>
+        <div class="form-group">
+            <label for="quality">Quality</label>
+            <select class="form-control" id="quality" name="quality" required>
+                <option value="Poor">Poor</option>
+                <option value="Fair">Fair</option>
+                <option value="Good">Good</option>
+                <option value="Excellent">Excellent</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Log Sleep</button>
+    </form>
+</div>
+{% endblock %}

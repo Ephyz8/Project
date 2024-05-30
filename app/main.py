@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, logout_user, current_user
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import User, Activity, Nutrition, Sleep, Mood
 from . import db
-from .forms import ProfileForm
+from .forms import ProfileForm, ContactForm
+import json
 
 main = Blueprint('main', __name__)
 
@@ -17,10 +18,12 @@ def about():
 
 @main.route('/contact', methods=['GET', 'POST'])
 def contact():
-    if request.method == 'POST':
+    form = ContactForm()
+    if form.validate_on_submit():
+        # Process the form data
         flash('Thank you for contacting us!', 'success')
         return redirect(url_for('main.home'))
-    return render_template('contact.html')
+    return render_template('contact.html', form=form)
 
 @main.route('/users', methods=['POST'])
 def create_user():
@@ -129,7 +132,31 @@ def delete_profile():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', name=current_user.username)
+    # Fetch user's data
+    user_id = current_user.id
+
+    # Calculate average sleep hours
+    sleep_data = Sleep.query.filter_by(user_id=user_id).all()
+    total_sleep_hours = sum(s.hours for s in sleep_data)
+    avg_sleep_hours = total_sleep_hours / len(sleep_data) if sleep_data else 0
+
+    # Calculate total calories
+    nutrition_data = Nutrition.query.filter_by(user_id=user_id).all()
+    total_calories = sum(n.calories for n in nutrition_data)
+
+    # Calculate mood trends
+    mood_data = Mood.query.filter_by(user_id=user_id).all()
+    mood_counts = {}
+    for mood in mood_data:
+        mood_counts[mood.mood] = mood_counts.get(mood.mood, 0) + 1
+
+    return render_template(
+        'dashboard.html', 
+        name=current_user.username, 
+        avg_sleep_hours=avg_sleep_hours, 
+        total_calories=total_calories, 
+        mood_counts=json.dumps(mood_counts)
+    )
 
 @main.route('/activity', methods=['POST'])
 @login_required
@@ -146,3 +173,101 @@ def log_activity():
     db.session.add(new_activity)
     db.session.commit()
     return jsonify({'message': 'Activity logged successfully'}), 201
+
+@main.route('/activity_data', methods=['POST'])
+@login_required
+def activity_data():
+    period = request.args.get('period', 'daily')
+    activities = get_activities_by_period(current_user.id, period)
+    activity_data = [{
+        "steps": a.steps,
+        "distance": a.distance,
+        "calories": a.calories,
+        "type": a.type,
+        "duration": a.duration,
+        "timestamp": a.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    } for a in activities]
+    return jsonify(activity_data), 200
+
+@main.route('/nutrition_data', methods=['POST'])
+@login_required
+def nutrition_data():
+    period = request.args.get('period', 'daily')
+    nutritions = get_nutritions_by_period(current_user.id, period)
+    calories = sum(n.calories for n in nutritions)
+    protein = sum(n.protein for n in nutritions)
+    carbs = sum(n.carbs for n in nutritions)
+    fats = sum(n.fats for n in nutritions)
+    return jsonify({"calories": calories, "protein": protein, "carbs": carbs, "fats": fats}), 200
+
+@main.route('/sleep_data', methods=['POST'])
+@login_required
+def sleep_data():
+    period = request.args.get('period', 'daily')
+    sleeps = get_sleeps_by_period(current_user.id, period)
+    sleep_data = [{
+        "hours": s.hours,
+        "quality": s.quality,
+        "date": s.date.strftime('%Y-%m-%d')
+    } for s in sleeps]
+    return jsonify(sleep_data), 200
+
+@main.route('/mood_data', methods=['POST'])
+@login_required
+def mood_data():
+    period = request.args.get('period', 'daily')
+    moods = get_moods_by_period(current_user.id, period)
+    mood_data = [{
+        "mood": m.mood,
+        "note": m.note,
+        "date": m.date.strftime('%Y-%m-%d')
+    } for m in moods]
+    return jsonify(mood_data), 200
+
+def get_activities_by_period(user_id, period):
+    now = datetime.utcnow()
+    if period == 'daily':
+        start_date = now - timedelta(days=1)
+    elif period == 'weekly':
+        start_date = now - timedelta(weeks=1)
+    elif period == 'monthly':
+        start_date = now - timedelta(days=30)
+    else:
+        start_date = now - timedelta(days=1)
+    return Activity.query.filter(Activity.user_id == user_id, Activity.timestamp >= start_date).all()
+
+def get_nutritions_by_period(user_id, period):
+    now = datetime.utcnow()
+    if period == 'daily':
+        start_date = now - timedelta(days=1)
+    elif period == 'weekly':
+        start_date = now - timedelta(weeks=1)
+    elif period == 'monthly':
+        start_date = now - timedelta(days=30)
+    else:
+        start_date = now - timedelta(days=1)
+    return Nutrition.query.filter(Nutrition.user_id == user_id, Nutrition.date >= start_date).all()
+
+def get_sleeps_by_period(user_id, period):
+    now = datetime.utcnow()
+    if period == 'daily':
+        start_date = now - timedelta(days=1)
+    elif period == 'weekly':
+        start_date = now - timedelta(weeks=1)
+    elif period == 'monthly':
+        start_date = now - timedelta(days=30)
+    else:
+        start_date = now - timedelta(days=1)
+    return Sleep.query.filter(Sleep.user_id == user_id, Sleep.date >= start_date).all()
+
+def get_moods_by_period(user_id, period):
+    now = datetime.utcnow()
+    if period == 'daily':
+        start_date = now - timedelta(days=1)
+    elif period == 'weekly':
+        start_date = now - timedelta(weeks=1)
+    elif period == 'monthly':
+        start_date = now - timedelta(days=30)
+    else:
+        start_date = now - timedelta(days=1)
+    return Mood.query.filter(Mood.user_id == user_id, Mood.date >= start_date).all()

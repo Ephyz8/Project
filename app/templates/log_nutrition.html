@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Log Nutrition</h1>
+    <form method="POST" action="{{ url_for('main.log_nutrition') }}">
+        <div class="form-group">
+            <label for="calories">Calories</label>
+            <input type="number" class="form-control" id="calories" name="calories" required>
+        </div>
+        <div class="form-group">
+            <label for="protein">Protein (in grams)</label>
+            <input type="number" class="form-control" id="protein" name="protein" required>
+        </div>
+        <div class="form-group">
+            <label for="carbs">Carbohydrates (in grams)</label>
+            <input type="number" class="form-control" id="carbs" name="carbs" required>
+        </div>
+        <div class="form-group">
+            <label for="fats">Fats (in grams)</label>
+            <input type="number" class="form-control" id="fats" name="fats" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Log Nutrition</button>
+    </form>
+</div>
+{% endblock %}

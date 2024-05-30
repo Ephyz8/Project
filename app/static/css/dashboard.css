@@ -1,0 +1,81 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #343a40;
+    margin-bottom: 30px;
+}
+
+h3 {
+    color: #495057;
+}
+
+/* Card styles */
+.card {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 1.5rem;
+    color: #495057;
+}
+
+/* Chart styles */
+canvas {
+    background-color: #ffffff;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 10px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .row > div {
+        margin-bottom: 20px;
+    }
+
+    .row > div:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .card-text {
+        font-size: 1.25rem;
+    }
+}

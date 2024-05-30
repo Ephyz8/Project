@@ -69,7 +69,7 @@ def login():
             app.logger.debug(f"Password is correct for user: {user.username}")
             login_user(user, remember=True)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+            return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
         else:
             app.logger.debug("Login failed. Either user not found or password incorrect.")
             flash('Login failed. Check your email and password.', 'error')

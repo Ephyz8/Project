@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -22,18 +21,37 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('main.about') }}">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('main.contact') }}">Contact</a></li>
                 {% if current_user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.create_or_update_profile') }}">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.create_or_update_profile') }}">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.log_activity') }}">Log Activity</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.log_nutrition') }}">Log Nutrition</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.log_sleep') }}">Log Sleep</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.log_mood') }}">Log Mood</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
                 {% endif %}
             </ul>
         </div>
     </nav>
 
     <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
         {% block content %}{% endblock %}
     </div>
 

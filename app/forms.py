@@ -47,3 +47,9 @@ class MoodForm(FlaskForm):
     note = TextAreaField('Note', validators=[Optional()])
     date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Log Mood')
+
+class ContactForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    message = TextAreaField('Message', validators=[DataRequired()])
+    submit = SubmitField('Submit')

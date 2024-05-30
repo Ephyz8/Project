@@ -22,7 +22,7 @@ def create_app(config_name):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///health_tracker.db'
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-    
+
     db.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)

@@ -1,17 +1,36 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2>Log Activity</h2>
-<form method="post" action="{{ url_for('main.log_activity') }}">
-     <!-- Include CSRF token -->
-     {{ form.csrf_token() }}
-    <div class="form-group">
-        <label for="activity_name">Activity Name</label>
-        <input type="text" class="form-control" id="activity_name" name="activity_name" required>
-    </div>
-    <div class="form-group">
-        <label for="duration">Duration (minutes)</label>
-        <input type="number" class="form-control" id="duration" name="duration" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Log Activity</button>
-</form>
+<div class="container mt-5">
+    <h1 class="text-center">Log Activity</h1>
+    <form method="POST" action="{{ url_for('log_activity') }}">
+        <div class="form-group">
+            <label for="steps">Steps</label>
+            <input type="number" class="form-control" id="steps" name="steps" required>
+        </div>
+        <div class="form-group">
+            <label for="distance">Distance (in km)</label>
+            <input type="number" step="0.01" class="form-control" id="distance" name="distance" required>
+        </div>
+        <div class="form-group">
+            <label for="calories">Calories</label>
+            <input type="number" class="form-control" id="calories" name="calories" required>
+        </div>
+        <div class="form-group">
+            <label for="type">Activity Type</label>
+            <select class="form-control" id="type" name="type" required>
+                <option value="Walking">Walking</option>
+                <option value="Running">Running</option>
+                <option value="Cycling">Cycling</option>
+                <option value="Swimming">Swimming</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="duration">Duration (in minutes)</label>
+            <input type="number" class="form-control" id="duration" name="duration" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Log Activity</button>
+    </form>
+</div>
 {% endblock %}
