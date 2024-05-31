@@ -81,7 +81,7 @@ def log_mood():
         new_mood = Mood(
             user_id=current_user.id,
             mood=data['mood'],
-            note=data['note'],
+            notes=data['notes'],
             date=datetime.utcnow()
         )
         db.session.add(new_mood)
@@ -194,7 +194,8 @@ def activity_data():
     } for a in activities]
     return jsonify(activity_data), 200
 
-@main.route('/nutrition_data', methods=['GET'])
+
+@main.route('/nutrition_data', methods=['POST'])
 @login_required
 def nutrition_data():
     period = request.args.get('period', 'daily')
@@ -208,7 +209,7 @@ def nutrition_data():
     } for n in nutritions]
     return jsonify(nutrition_data), 200
 
-@main.route('/sleep_data', methods=['GET'])
+@main.route('/sleep_data', methods=['POST'])
 @login_required
 def sleep_data():
     period = request.args.get('period', 'daily')
@@ -226,8 +227,8 @@ def mood_data():
     period = request.args.get('period', 'daily')
     moods = get_moods_by_period(current_user.id, period)
     mood_data = [{
-        "mood": m.mood,
-        "note": m.note,
+        "rating": m.rating,
+        "notes": m.notes,
         "date": m.date.strftime('%Y-%m-%d')
     } for m in moods]
     return jsonify(mood_data), 200

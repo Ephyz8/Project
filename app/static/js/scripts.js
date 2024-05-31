@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to fetch data and initialize charts
 function fetchDataAndDisplay(apiEndpoint, canvasId, chartLabel, yAxisLabel) {
-  fetch(apiEndpoint, { method: 'POST' })
+  fetch(apiEndpoint, { method: 'GET' })
     .then(response => response.json())
     .then(data => {
       const labels = data.map(item => item.date || item.timestamp);
