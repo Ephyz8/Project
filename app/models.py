@@ -43,31 +43,28 @@ class User(UserMixin, db.Model):
         }
 
 class Activity(db.Model):
-    """
-    Defines an Activity class that inherits from db.Model, making it a model class for SQLAlchemy.
-    """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    activity_type = db.Column(db.String(50), nullable=False)
-    duration = db.Column(db.Integer, nullable=False)  # Duration in minutes
-    steps = db.Column(db.Integer, nullable=True)
-    distance = db.Column(db.Float, nullable=True)  # Distance in kilometers
-    calories_burned = db.Column(db.Integer, nullable=True)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    steps = db.Column(db.Integer, nullable=False)
+    distance = db.Column(db.Float, nullable=False)
+    calories = db.Column(db.Integer, nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    duration = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f'<Activity {self.activity_type}>'
-
+        return f'<Activity {self.type}>'
+    
     def to_dict(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'activity_type': self.activity_type,
+            'date': self.date,
             'duration': self.duration,
             'steps': self.steps,
             'distance': self.distance,
-            'calories_burned': self.calories_burned,
-            'timestamp': self.timestamp
+            'calories': self.calories,
+            'type': self.type
         }
 
 class Nutrition(db.Model):

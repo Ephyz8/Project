@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center">Log Mood</h1>
-    <form method="POST" action="{{ url_for('main.log_mood') }}">
+    <form method="GET" action="{{ url_for('main.log_mood') }}">
         {{ form.csrf_token }}
         <div class="form-group">
             <label for="mood">Mood</label>

@@ -4,21 +4,22 @@
 <div class="container mt-5">
     <h1 class="text-center">Log Nutrition</h1>
     <form method="POST" action="{{ url_for('main.log_nutrition') }}">
+        {{ form.hidden_tag() }}
         <div class="form-group">
             <label for="calories">Calories</label>
-            <input type="number" class="form-control" id="calories" name="calories" required>
+            {{ form.calories(class="form-control", id="calories") }}
         </div>
         <div class="form-group">
             <label for="protein">Protein (in grams)</label>
-            <input type="number" class="form-control" id="protein" name="protein" required>
+            {{ form.protein(class="form-control", id="protein") }}
         </div>
         <div class="form-group">
             <label for="carbs">Carbohydrates (in grams)</label>
-            <input type="number" class="form-control" id="carbs" name="carbs" required>
+            {{ form.carbs(class="form-control", id="carbs") }}
         </div>
         <div class="form-group">
             <label for="fats">Fats (in grams)</label>
-            <input type="number" class="form-control" id="fats" name="fats" required>
+            {{ form.fats(class="form-control", id="fats") }}
         </div>
         <button type="submit" class="btn btn-primary">Log Nutrition</button>
     </form>

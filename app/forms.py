@@ -23,9 +23,21 @@ class ProfileForm(FlaskForm):
     date_of_birth = DateField('Date of Birth', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Update Profile')
 
+class DeleteProfileForm(FlaskForm):
+    submit = SubmitField('Delete Profile')
+    
 class ActivityForm(FlaskForm):
-    activity_type = StringField('Activity Type', validators=[DataRequired(), Length(max=50)])
-    duration = IntegerField('Duration (minutes)', validators=[DataRequired(), NumberRange(min=1)])
+    steps = IntegerField('Steps', validators=[DataRequired()])
+    distance = FloatField('Distance (in km)', validators=[DataRequired()])
+    calories = IntegerField('Calories', validators=[DataRequired()])
+    type = SelectField('Activity Type', choices=[
+        ('Walking', 'Walking'),
+        ('Running', 'Running'),
+        ('Cycling', 'Cycling'),
+        ('Swimming', 'Swimming'),
+        ('Other', 'Other')
+    ], validators=[DataRequired()])
+    duration = IntegerField('Duration (in minutes)', validators=[DataRequired()])
     submit = SubmitField('Log Activity')
 
 class NutritionForm(FlaskForm):

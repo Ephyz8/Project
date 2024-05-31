@@ -2,24 +2,50 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>About HealthTrack</h1>
-    <p class="lead">Your comprehensive health and wellness tracking companion.</p>
-    <p>HealthTrack is a state-of-the-art web application designed to empower you on your journey to a healthier life. Our mission is to provide you with the tools and insights necessary to monitor and improve your physical and mental well-being.</p>
+    <h1 class="text-center mb-4">About HealthTrack</h1>
+    <p class="lead text-center mb-5">Your comprehensive health and wellness tracking companion.</p>
+    <p class="text-justify">HealthTrack is a state-of-the-art web application designed to empower you on your journey to a healthier life. Our mission is to provide you with the tools and insights necessary to monitor and improve your physical and mental well-being.</p>
     
-    <h3>Key Features</h3>
-    <ul>
-        <li><strong>Health Metrics Tracking:</strong> Easily log and track various health metrics such as weight, blood pressure, and physical activity.</li>
-        <li><strong>Data Visualization:</strong> Visualize your health data with interactive charts to identify trends and make informed decisions.</li>
-        <li><strong>Personalized Insights:</strong> Receive personalized health insights based on your data to help you achieve your wellness goals.</li>
-        <li><strong>Secure and Private:</strong> Your data is securely stored and protected, ensuring your privacy and confidentiality.</li>
+    <h3 class="mt-5">Key Features</h3>
+    <ul class="list-unstyled">
+        <li class="media my-4">
+            <i class="fas fa-heartbeat fa-2x mr-3"></i>
+            <div class="media-body">
+                <h5 class="mt-0 mb-1"><strong>Health Metrics Tracking:</strong></h5>
+                Easily log and track various health metrics such as weight, blood pressure, and physical activity.
+            </div>
+        </li>
+        <li class="media my-4">
+            <i class="fas fa-chart-line fa-2x mr-3"></i>
+            <div class="media-body">
+                <h5 class="mt-0 mb-1"><strong>Data Visualization:</strong></h5>
+                Visualize your health data with interactive charts to identify trends and make informed decisions.
+            </div>
+        </li>
+        <li class="media my-4">
+            <i class="fas fa-brain fa-2x mr-3"></i>
+            <div class="media-body">
+                <h5 class="mt-0 mb-1"><strong>Personalized Insights:</strong></h5>
+                Receive personalized health insights based on your data to help you achieve your wellness goals.
+            </div>
+        </li>
+        <li class="media my-4">
+            <i class="fas fa-lock fa-2x mr-3"></i>
+            <div class="media-body">
+                <h5 class="mt-0 mb-1"><strong>Secure and Private:</strong></h5>
+                Your data is securely stored and protected, ensuring your privacy and confidentiality.
+            </div>
+        </li>
     </ul>
     
-    <h3>Why Choose HealthTrack?</h3>
-    <p>HealthTrack is more than just a tracker; it's your personal health assistant. With our user-friendly interface and advanced analytics, you can stay on top of your health with minimal effort. Whether you're looking to lose weight, manage a chronic condition, or simply live a healthier life, HealthTrack is here to support you every step of the way.</p>
+    <h3 class="mt-5">Why Choose HealthTrack?</h3>
+    <p class="text-justify">HealthTrack is more than just a tracker; it's your personal health assistant. With our user-friendly interface and advanced analytics, you can stay on top of your health with minimal effort. Whether you're looking to lose weight, manage a chronic condition, or simply live a healthier life, HealthTrack is here to support you every step of the way.</p>
     
-    <p>Join our community of health-conscious individuals and take control of your wellness journey today!</p>
+    <p class="text-justify">Join our community of health-conscious individuals and take control of your wellness journey today!</p>
     
-    <a href="{{ url_for('main.home') }}" class="btn btn-primary">Home</a>
-    <a href="{{ url_for('main.contact') }}" class="btn btn-secondary">Contact</a>
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.home') }}" class="btn btn-primary mr-2">Home</a>
+        <a href="{{ url_for('main.contact') }}" class="btn btn-secondary">Contact</a>
+    </div>
 </div>
 {% endblock %}

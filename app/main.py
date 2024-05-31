@@ -3,7 +3,7 @@ from flask_login import login_required, logout_user, current_user
 from datetime import datetime, timedelta
 from .models import User, Activity, Nutrition, Sleep, Mood
 from . import db
-from .forms import ProfileForm, ContactForm, MoodForm
+from .forms import DeleteProfileForm, ProfileForm, SleepForm, ContactForm, MoodForm, ActivityForm, NutritionForm
 import json
 
 main = Blueprint('main', __name__)
@@ -42,35 +42,39 @@ def create_user():
     db.session.commit()
     return jsonify({'message': 'User created!'}), 201
 
-@main.route('/nutrition', methods=['POST'])
+@main.route('/log_nutrition', methods=['GET', 'POST'])
 @login_required
 def log_nutrition():
-    data = request.get_json()
-    new_nutrition = Nutrition(
-        user_id=current_user.id,
-        calories=data['calories'],
-        protein=data['protein'],
-        carbs=data['carbs'],
-        fats=data['fats'],
-        date=datetime.strptime(data['date'], '%Y-%m-%d') if 'date' in data else datetime.utcnow()
-    )
-    db.session.add(new_nutrition)
-    db.session.commit()
-    return jsonify({'message': 'Nutrition logged successfully'}), 201
+    form = NutritionForm()
+    if form.validate_on_submit():
+        nutrition = Nutrition(
+            user_id=current_user.id,
+            calories=form.calories.data,
+            protein=form.protein.data,
+            carbs=form.carbs.data,
+            fats=form.fats.data
+        )
+        db.session.add(nutrition)
+        db.session.commit()
+        flash('Nutrition logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_nutrition.html', title='Log Nutrition', form=form)
 
-@main.route('/sleep', methods=['POST'])
+@main.route('/log_sleep', methods=['GET', 'POST'])
 @login_required
 def log_sleep():
-    data = request.get_json()
-    new_sleep = Sleep(
-        user_id=current_user.id,
-        hours=data['hours'],
-        quality=data['quality'],
-        date=datetime.strptime(data['date'], '%Y-%m-%d') if 'date' in data else datetime.utcnow()
-    )
-    db.session.add(new_sleep)
-    db.session.commit()
-    return jsonify({'message': 'Sleep logged successfully'}), 201
+    form = SleepForm()
+    if form.validate_on_submit():
+        sleep = Sleep(
+            user_id=current_user.id,
+            hours=form.hours.data,
+            quality=form.quality.data
+        )
+        db.session.add(sleep)
+        db.session.commit()
+        flash('Sleep logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_sleep.html', title='Log Sleep', form=form)
 
 @main.route('/mood', methods=['GET', 'POST'])
 @login_required
@@ -90,48 +94,38 @@ def log_mood():
         return redirect(url_for('main.dashboard'))
     return render_template('log_mood.html', form=form)
 
-@main.route('/profile', methods=['GET'])
-@login_required
-def get_profile():
-    user = User.query.get_or_404(current_user.id)
-    profile_data = {
-        "username": user.username,
-        "email": user.email,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "bio": user.bio,
-        "location": user.location,
-        "date_of_birth": user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else None
-    }
-    return jsonify(profile_data), 200
-
-@main.route('/profile', methods=['POST'])
+@main.route('/profile', methods=['GET', 'POST'])
 @login_required
 def create_or_update_profile():
     form = ProfileForm()
     if form.validate_on_submit():
-        user = User.query.get_or_404(current_user.id)
-        user.first_name = form.first_name.data
-        user.last_name = form.last_name.data
-        user.bio = form.bio.data
-        user.location = form.location.data
-        user.date_of_birth = form.date_of_birth.data
-
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.bio = form.bio.data
+        current_user.location = form.location.data
+        current_user.date_of_birth = form.date_of_birth.data
         db.session.commit()
-        flash('Profile updated successfully!', 'success')
+        flash('Your profile has been updated.', 'success')
         return redirect(url_for('main.dashboard'))
-    flash('Form validation failed. Please correct the errors and try again.', 'error')
-    return render_template('profile.html', form=form)
+    elif request.method == 'GET':
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.bio.data = current_user.bio
+        form.location.data = current_user.location
+        form.date_of_birth.data = current_user.date_of_birth
+    return render_template('profile.html', title='Profile', form=form)
 
-@main.route('/profile', methods=['DELETE'])
+@main.route('/delete_profile', methods=['POST'])
 @login_required
 def delete_profile():
-    user = User.query.get_or_404(current_user.id)
-    db.session.delete(user)
-    db.session.commit()
-    logout_user()
-    flash('Profile deleted successfully.', 'success')
-    return redirect(url_for('auth.login'))
+    form = DeleteProfileForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(id=current_user.id).first_or_404()
+        db.session.delete(user)
+        db.session.commit()
+        flash('Your profile has been deleted.', 'success')
+        return redirect(url_for('main.home'))
+    return render_template('profile.html', title='Profile', delete_form=form)
 
 @main.route('/dashboard')
 @login_required
@@ -162,7 +156,7 @@ def dashboard():
         mood_counts=json.dumps(mood_counts)
     )
 
-@main.route('/activity', methods=['POST'])
+"""@main.route('/activity', methods=['POST'])
 @login_required
 def log_activity():
     data = request.get_json()
@@ -176,24 +170,27 @@ def log_activity():
     )
     db.session.add(new_activity)
     db.session.commit()
-    return jsonify({'message': 'Activity logged successfully'}), 201
+    return jsonify({'message': 'Activity logged successfully'}), 201"""
 
-# Update the following endpoints to allow GET requests
-@main.route('/activity_data', methods=['GET'])
+@main.route('/log_activity', methods=['GET', 'POST'])
 @login_required
-def activity_data():
-    period = request.args.get('period', 'daily')
-    activities = get_activities_by_period(current_user.id, period)
-    activity_data = [{
-        "steps": a.steps,
-        "distance": a.distance,
-        "calories": a.calories,
-        "type": a.type,
-        "duration": a.duration,
-        "timestamp": a.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    } for a in activities]
-    return jsonify(activity_data), 200
-
+def log_activity():
+    form = ActivityForm()
+    if form.validate_on_submit():
+        activity = Activity(
+            user_id=current_user.id,
+            steps=form.steps.data,
+            distance=form.distance.data,
+            calories=form.calories.data,
+            type=form.type.data,
+            duration=form.duration.data,
+            date=datetime.utcnow()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        flash('Activity logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_activity.html', form=form)
 
 @main.route('/nutrition_data', methods=['POST'])
 @login_required
@@ -209,7 +206,7 @@ def nutrition_data():
     } for n in nutritions]
     return jsonify(nutrition_data), 200
 
-@main.route('/sleep_data', methods=['POST'])
+@main.route('/sleep_data', methods=['GET'])
 @login_required
 def sleep_data():
     period = request.args.get('period', 'daily')
