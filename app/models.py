@@ -76,7 +76,7 @@ class Nutrition(db.Model):
     date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     calories = db.Column(db.Integer, nullable=False)
     protein = db.Column(db.Float, nullable=False)
-    fat = db.Column(db.Float, nullable=False)
+    fats = db.Column(db.Float, nullable=False)
     carbs = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -89,7 +89,7 @@ class Nutrition(db.Model):
             'date': self.date,
             'calories': self.calories,
             'protein': self.protein,
-            'fat': self.fat,
+            'fats': self.fats,
             'carbs': self.carbs
         }
 

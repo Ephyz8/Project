@@ -56,10 +56,11 @@ class SleepForm(FlaskForm):
 
 class MoodForm(FlaskForm):
     mood = SelectField('Mood', choices=[('Very Bad', 'Very Bad'), ('Bad', 'Bad'), ('Neutral', 'Neutral'), ('Good', 'Good'), ('Very Good', 'Very Good')], validators=[DataRequired()])
-    note = TextAreaField('Note', validators=[Optional()])
+    notes = TextAreaField('Note', validators=[Optional()])
     date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Log Mood')
-
+    rating = IntegerField('Rating', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])

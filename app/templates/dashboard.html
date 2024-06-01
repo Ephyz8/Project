@@ -6,7 +6,7 @@
     
     <!-- Average Data Display -->
     <div class="row mt-4">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
                     <h5 class="card-title">Average Sleep Hours</h5>
@@ -14,7 +14,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Calories</h5>
@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
                     <h5 class="card-title">Mood Trends</h5>
@@ -36,21 +36,29 @@
     <div class="row mt-4">
         <div class="col-md-6">
             <h3>Activity</h3>
-            <canvas id="activityChart"></canvas>
+            <div class="chart-container">
+                <canvas id="activityChart"></canvas>
+            </div>
         </div>
         <div class="col-md-6">
             <h3>Nutrition</h3>
-            <canvas id="nutritionChart"></canvas>
+            <div class="chart-container">
+                <canvas id="nutritionChart"></canvas>
+            </div>
         </div>
     </div>
     <div class="row mt-4">
         <div class="col-md-6">
             <h3>Sleep</h3>
-            <canvas id="sleepChart"></canvas>
+            <div class="chart-container">
+                <canvas id="sleepChart"></canvas>
+            </div>
         </div>
         <div class="col-md-6">
             <h3>Mood</h3>
-            <canvas id="moodChart"></canvas>
+            <div class="chart-container">
+                <canvas id="moodChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
@@ -64,20 +72,34 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('/dashboard_data')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('averageSleepHours').textContent = data.average_sleep_hours + " hours";
+            document.getElementById('averageSleepHours').textContent = data.avg_sleep_hours.toFixed(2) + " hours";
             document.getElementById('totalCalories').textContent = data.total_calories + " kcal";
-            document.getElementById('moodTrends').textContent = data.mood_trends;
+            document.getElementById('moodTrends').textContent = JSON.stringify(data.mood_counts);
         });
+
+    // Chart configurations
+    const chartConfig = {
+        type: 'line',
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
 
     // Fetch and display activity data
     fetch('/activity_data')
         .then(response => response.json())
         .then(data => {
-            var ctx = document.getElementById('activityChart').getContext('2d');
+            const ctx = document.getElementById('activityChart').getContext('2d');
             new Chart(ctx, {
-                type: 'bar',
+                ...chartConfig,
                 data: {
-                    labels: data.map(item => item.timestamp),
+                    labels: data.map(item => item.date),
                     datasets: [{
                         label: 'Steps',
                         data: data.map(item => item.steps),
@@ -85,13 +107,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
                 }
             });
         });
@@ -100,14 +115,14 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('/nutrition_data')
         .then(response => response.json())
         .then(data => {
-            var ctx = document.getElementById('nutritionChart').getContext('2d');
+            const ctx = document.getElementById('nutritionChart').getContext('2d');
             new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: ['Calories', 'Protein', 'Carbs', 'Fats'],
                     datasets: [{
                         label: 'Nutrition',
-                        data: [data.calories, data.protein, data.carbs, data.fats],
+                        data: [data.reduce((sum, n) => sum + n.calories, 0), data.reduce((sum, n) => sum + n.protein, 0), data.reduce((sum, n) => sum + n.carbs, 0), data.reduce((sum, n) => sum + n.fats, 0)],
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -134,9 +149,9 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('/sleep_data')
         .then(response => response.json())
         .then(data => {
-            var ctx = document.getElementById('sleepChart').getContext('2d');
+            const ctx = document.getElementById('sleepChart').getContext('2d');
             new Chart(ctx, {
-                type: 'line',
+                ...chartConfig,
                 data: {
                     labels: data.map(item => item.date),
                     datasets: [{
@@ -146,13 +161,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         borderColor: 'rgba(153, 102, 255, 1)',
                         borderWidth: 1
                     }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
                 }
             });
         });
@@ -161,22 +169,24 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('/mood_data')
         .then(response => response.json())
         .then(data => {
-            var ctx = document.getElementById('moodChart').getContext('2d');
+            const ctx = document.getElementById('moodChart').getContext('2d');
             new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: data.map(item => item.date),
                     datasets: [{
                         label: 'Mood',
-                        data: data.map(item => item.mood),
+                        data: data.map(item => item.rating),
                         backgroundColor: 'rgba(255, 159, 64, 0.2)',
                         borderColor: 'rgba(255, 159, 64, 1)',
                         borderWidth: 1
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
-                        y: {
+                        r: {
                             beginAtZero: true
                         }
                     }

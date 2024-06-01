@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, logout_user, current_user
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash
 from .models import User, Activity, Nutrition, Sleep, Mood
 from . import db
 from .forms import DeleteProfileForm, ProfileForm, SleepForm, ContactForm, MoodForm, ActivityForm, NutritionForm
@@ -81,11 +82,10 @@ def log_sleep():
 def log_mood():
     form = MoodForm()
     if request.method == 'POST' and form.validate_on_submit():
-        data = request.form
         new_mood = Mood(
             user_id=current_user.id,
-            mood=data['mood'],
-            notes=data['notes'],
+            rating=form.rating.data,
+            notes=form.notes.data,
             date=datetime.utcnow()
         )
         db.session.add(new_mood)
@@ -130,23 +130,19 @@ def delete_profile():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    # Fetch user's data
     user_id = current_user.id
 
-    # Calculate average sleep hours
     sleep_data = Sleep.query.filter_by(user_id=user_id).all()
     total_sleep_hours = sum(s.hours for s in sleep_data)
     avg_sleep_hours = total_sleep_hours / len(sleep_data) if sleep_data else 0
 
-    # Calculate total calories
     nutrition_data = Nutrition.query.filter_by(user_id=user_id).all()
     total_calories = sum(n.calories for n in nutrition_data)
 
-    # Calculate mood trends
     mood_data = Mood.query.filter_by(user_id=user_id).all()
     mood_counts = {}
     for mood in mood_data:
-        mood_counts[mood.mood] = mood_counts.get(mood.mood, 0) + 1
+        mood_counts[mood.rating] = mood_counts.get(mood.rating, 0) + 1
 
     return render_template(
         'dashboard.html', 
@@ -155,22 +151,6 @@ def dashboard():
         total_calories=total_calories, 
         mood_counts=json.dumps(mood_counts)
     )
-
-"""@main.route('/activity', methods=['POST'])
-@login_required
-def log_activity():
-    data = request.get_json()
-    new_activity = Activity(
-        user_id=current_user.id,
-        steps=data['steps'],
-        distance=data['distance'],
-        calories=data['calories'],
-        type=data['type'],
-        duration=data['duration']
-    )
-    db.session.add(new_activity)
-    db.session.commit()
-    return jsonify({'message': 'Activity logged successfully'}), 201"""
 
 @main.route('/log_activity', methods=['GET', 'POST'])
 @login_required
@@ -192,7 +172,22 @@ def log_activity():
         return redirect(url_for('main.dashboard'))
     return render_template('log_activity.html', form=form)
 
-@main.route('/nutrition_data', methods=['POST'])
+@main.route('/activity_data', methods=['GET'])
+@login_required
+def activity_data():
+    period = request.args.get('period', 'daily')
+    activities = get_activities_by_period(current_user.id, period)
+    activity_data = [{
+        "steps": a.steps,
+        "distance": a.distance,
+        "calories": a.calories,
+        "type": a.type,
+        "duration": a.duration,
+        "date": a.date.strftime('%Y-%m-%d')
+    } for a in activities]
+    return jsonify(activity_data), 200
+
+@main.route('/nutrition_data', methods=['GET'])
 @login_required
 def nutrition_data():
     period = request.args.get('period', 'daily')
@@ -240,7 +235,7 @@ def get_activities_by_period(user_id, period):
         start_date = now - timedelta(days=30)
     else:
         start_date = now - timedelta(days=1)
-    return Activity.query.filter(Activity.user_id == user_id, Activity.timestamp >= start_date).all()
+    return Activity.query.filter(Activity.user_id == user_id, Activity.date >= start_date).all()
 
 def get_nutritions_by_period(user_id, period):
     now = datetime.utcnow()
