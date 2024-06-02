@@ -27,9 +27,9 @@ class DeleteProfileForm(FlaskForm):
     submit = SubmitField('Delete Profile')
     
 class ActivityForm(FlaskForm):
-    steps = IntegerField('Steps', validators=[DataRequired()])
-    distance = FloatField('Distance (in km)', validators=[DataRequired()])
-    calories = IntegerField('Calories', validators=[DataRequired()])
+    steps = IntegerField('Steps', validators=[DataRequired(), NumberRange(min=0)])
+    distance = FloatField('Distance (in km)', validators=[DataRequired(), NumberRange(min=0)])
+    calories = IntegerField('Calories', validators=[DataRequired(), NumberRange(min=0)])
     type = SelectField('Activity Type', choices=[
         ('Walking', 'Walking'),
         ('Running', 'Running'),
@@ -37,7 +37,7 @@ class ActivityForm(FlaskForm):
         ('Swimming', 'Swimming'),
         ('Other', 'Other')
     ], validators=[DataRequired()])
-    duration = IntegerField('Duration (in minutes)', validators=[DataRequired()])
+    duration = IntegerField('Duration (in minutes)', validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField('Log Activity')
 
 class NutritionForm(FlaskForm):
