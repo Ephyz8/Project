@@ -43,57 +43,6 @@ def create_user():
     db.session.commit()
     return jsonify({'message': 'User created!'}), 201
 
-@main.route('/log_nutrition', methods=['GET', 'POST'])
-@login_required
-def log_nutrition():
-    form = NutritionForm()
-    if form.validate_on_submit():
-        nutrition = Nutrition(
-            user_id=current_user.id,
-            calories=form.calories.data,
-            protein=form.protein.data,
-            carbs=form.carbs.data,
-            fats=form.fats.data
-        )
-        db.session.add(nutrition)
-        db.session.commit()
-        flash('Nutrition logged successfully!', 'success')
-        return redirect(url_for('main.dashboard'))
-    return render_template('log_nutrition.html', title='Log Nutrition', form=form)
-
-@main.route('/log_sleep', methods=['GET', 'POST'])
-@login_required
-def log_sleep():
-    form = SleepForm()
-    if form.validate_on_submit():
-        sleep = Sleep(
-            user_id=current_user.id,
-            hours=form.hours.data,
-            quality=form.quality.data
-        )
-        db.session.add(sleep)
-        db.session.commit()
-        flash('Sleep logged successfully!', 'success')
-        return redirect(url_for('main.dashboard'))
-    return render_template('log_sleep.html', title='Log Sleep', form=form)
-
-@main.route('/mood', methods=['GET', 'POST'])
-@login_required
-def log_mood():
-    form = MoodForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        new_mood = Mood(
-            user_id=current_user.id,
-            rating=form.rating.data,
-            notes=form.notes.data,
-            date=datetime.utcnow()
-        )
-        db.session.add(new_mood)
-        db.session.commit()
-        flash('Mood logged successfully!', 'success')
-        return redirect(url_for('main.dashboard'))
-    return render_template('log_mood.html', form=form)
-
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required
 def create_or_update_profile():
@@ -120,14 +69,25 @@ def create_or_update_profile():
 def delete_profile():
     form = DeleteProfileForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(id=current_user.id).first_or_404()
+        user_id = current_user.id
+
+        # Delete all associated records
+        Activity.query.filter_by(user_id=user_id).delete()
+        Nutrition.query.filter_by(user_id=user_id).delete()
+        Sleep.query.filter_by(user_id=user_id).delete()
+        Mood.query.filter_by(user_id=user_id).delete()
+        
+        # Now delete the user
+        user = User.query.filter_by(id=user_id).first_or_404()
+        logout_user()  # Log out the user before deleting the profile
         db.session.delete(user)
         db.session.commit()
+
         flash('Your profile has been deleted.', 'success')
         return redirect(url_for('main.home'))
     return render_template('profile.html', title='Profile', delete_form=form)
 
-@main.route('/dashboard')
+@main.route('/dashboard_data')
 @login_required
 def dashboard():
     user_id = current_user.id
@@ -151,6 +111,64 @@ def dashboard():
         total_calories=total_calories, 
         mood_counts=json.dumps(mood_counts)
     )
+
+@main.route('/log_sleep', methods=['GET', 'POST'])
+@login_required
+def log_sleep():
+    form = SleepForm()
+    if form.validate_on_submit():
+        sleep = Sleep(
+            user_id=current_user.id,
+            hours=form.hours.data,
+            quality=form.quality.data,
+            date=datetime.utcnow().date()
+        )
+        db.session.add(sleep)
+        db.session.commit()
+        flash('Sleep logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_sleep.html', title='Log Sleep', form=form)
+
+@main.route('/sleep_data', methods=['GET'])
+@login_required
+def sleep_data():
+    period = request.args.get('period', 'daily')
+    sleeps = get_sleeps_by_period(current_user.id, period)
+    sleep_data = [{
+        "hours": sleep.hours,
+        "quality": sleep.quality,
+        "date": sleep.date.strftime('%Y-%m-%d')
+    } for sleep in sleeps]
+    return jsonify(sleep_data), 200
+
+@main.route('/log_mood', methods=['GET', 'POST'])
+@login_required
+def log_mood():
+    form = MoodForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        new_mood = Mood(
+            user_id=current_user.id,
+            rating=form.rating.data,
+            notes=form.notes.data,
+            date=datetime.utcnow().date()
+        )
+        db.session.add(new_mood)
+        db.session.commit()
+        flash('Mood logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_mood.html', form=form)
+
+@main.route('/mood_data', methods=['GET'])
+@login_required
+def mood_data():
+    period = request.args.get('period', 'daily')
+    moods = get_moods_by_period(current_user.id, period)
+    mood_data = [{
+        "rating": mood.rating,
+        "notes": mood.notes,
+        "date": mood.date.strftime('%Y-%m-%d')
+    } for mood in moods]
+    return jsonify(mood_data), 200
 
 @main.route('/log_activity', methods=['GET', 'POST'])
 @login_required
@@ -187,6 +205,26 @@ def activity_data():
     } for a in activities]
     return jsonify(activity_data), 200
 
+@main.route('/log_nutrition', methods=['GET', 'POST'])
+@login_required
+def log_nutrition():
+    form = NutritionForm()
+    if form.validate_on_submit():
+        nutrition = Nutrition(
+            user_id=current_user.id,
+            calories=form.calories.data,
+            protein=form.protein.data,
+            carbs=form.carbs.data,
+            fats=form.fats.data,
+            date=datetime.utcnow().date()
+        )
+        db.session.add(nutrition)
+        db.session.commit()
+        flash('Nutrition logged successfully!', 'success')
+        return redirect(url_for('main.dashboard'))
+    return render_template('log_nutrition.html', title='Log Nutrition', form=form)
+
+
 @main.route('/nutrition_data', methods=['GET'])
 @login_required
 def nutrition_data():
@@ -200,30 +238,6 @@ def nutrition_data():
         "date": n.date.strftime('%Y-%m-%d')
     } for n in nutritions]
     return jsonify(nutrition_data), 200
-
-@main.route('/sleep_data', methods=['GET'])
-@login_required
-def sleep_data():
-    period = request.args.get('period', 'daily')
-    sleeps = get_sleeps_by_period(current_user.id, period)
-    sleep_data = [{
-        "hours": s.hours,
-        "quality": s.quality,
-        "date": s.date.strftime('%Y-%m-%d')
-    } for s in sleeps]
-    return jsonify(sleep_data), 200
-
-@main.route('/mood_data', methods=['GET'])
-@login_required
-def mood_data():
-    period = request.args.get('period', 'daily')
-    moods = get_moods_by_period(current_user.id, period)
-    mood_data = [{
-        "rating": m.rating,
-        "notes": m.notes,
-        "date": m.date.strftime('%Y-%m-%d')
-    } for m in moods]
-    return jsonify(mood_data), 200
 
 def get_activities_by_period(user_id, period):
     now = datetime.utcnow()

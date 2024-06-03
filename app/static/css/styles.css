@@ -27,6 +27,29 @@ body {
   margin-top: 1.5rem;
 }
 
+/* About Me Section */
+.about-me {
+  padding: 5rem 0;
+}
+
+.about-me img {
+  max-width: 100%;
+  border-radius: 50%;
+  margin-bottom: 2rem;
+}
+
+.about-me h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.about-me p {
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
 /* Features Section */
 .features {
   padding: 5rem 0;
@@ -40,6 +63,39 @@ body {
   font-size: 1.5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
+  color: rgb(56, 66, 172);
+}
+
+/* Detailed Features Section */
+.detailed-features {
+  padding: 5rem 0;
+}
+
+.detailed-features .feature {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.detailed-features h3 {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: rgb(56, 66, 172);
+}
+
+.detailed-features .feature img {
+  max-width: 100px;
+  margin-right: 1.5rem;
+}
+
+.detailed-features h4 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.detailed-features p {
+  margin-bottom: 0;
 }
 
 /* Testimonials Section */
@@ -66,82 +122,7 @@ body {
 
 /* Call to Action Section */
 .cta {
-  background: #007bff; /* Primary color */
+  background: #71b0f3; /* Primary color */
   color: white;
   padding: 5rem 0;
-}
-
-.cta h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-
-.cta .btn {
-  margin-top: 1.5rem;
-}
-
-/* Footer */
-.footer {
-  background: #f8f9fa; /* Light background */
-  padding: 1.5rem 0;
-}
-
-.footer .text-muted {
-  color: #6c757d !important; /* Override color for text-muted */
-}
-
-/* styles.css */
-
-/* General page styles */
-.container {
-  margin-top: 50px;
-}
-
-/* Header styles */
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.lead {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.text-justify {
-  text-align: justify;
-}
-
-/* Key features styles */
-h3 {
-  margin-top: 50px;
-}
-
-.list-unstyled {
-  padding-left: 0;
-  list-style: none;
-}
-
-.media {
-  margin-bottom: 20px;
-}
-
-.media i {
-  color: #007bff; /* Change icon color */
-  margin-right: 15px;
-}
-
-.media h5 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-/* Button styles */
-.text-center {
-  text-align: center;
-  margin-top: 30px;
-}
-
-.btn-primary {
-  margin-right: 10px;
 }
