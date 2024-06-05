@@ -3,11 +3,14 @@
 /* General Styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  line-height: 1.6;
 }
 
 .section-title {
   margin-bottom: 1.5rem;
   font-weight: bold;
+  font-size: 2rem;
 }
 
 /* Hero Section */
@@ -15,27 +18,53 @@ body {
   background: url('https://source.unsplash.com/1600x900/?health,fitness') no-repeat center center;
   background-size: cover;
   color: white;
-  padding: 5rem 0;
+  padding: 10rem 0;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.hero .container {
+  position: relative;
+  z-index: 1;
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 4rem;
   font-weight: 700;
+  margin-bottom: 1.5rem;
 }
 
 .hero .btn {
   margin-top: 1.5rem;
+  padding: 1rem 2rem;
+  font-size: 1.25rem;
+  transition: background 0.3s ease;
+}
+
+.hero .btn:hover {
+  background: #555;
 }
 
 /* About Me Section */
 .about-me {
   padding: 5rem 0;
+  background: #f9f9f9;
 }
 
 .about-me img {
   max-width: 100%;
   border-radius: 50%;
   margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .about-me h3 {
@@ -47,12 +76,14 @@ body {
 
 .about-me p {
   font-size: 1.125rem;
-  line-height: 1.5;
+  line-height: 1.75;
+  margin-bottom: 0;
 }
 
 /* Features Section */
 .features {
   padding: 5rem 0;
+  background: #ffffff;
 }
 
 .features .fa-3x {
@@ -66,15 +97,43 @@ body {
   color: rgb(56, 66, 172);
 }
 
+.features .feature-icon {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.features .feature-icon i {
+  color: #3872ac;
+  margin-right: 1rem;
+}
+
+.features img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Detailed Features Section */
 .detailed-features {
   padding: 5rem 0;
+  background: #f4f4f4;
 }
 
 .detailed-features .feature {
   display: flex;
   align-items: center;
   margin-bottom: 2rem;
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.detailed-features .feature:hover {
+  transform: translateY(-5px);
 }
 
 .detailed-features h3 {
@@ -87,6 +146,7 @@ body {
 .detailed-features .feature img {
   max-width: 100px;
   margin-right: 1.5rem;
+  border-radius: 8px;
 }
 
 .detailed-features h4 {
@@ -96,6 +156,43 @@ body {
 
 .detailed-features p {
   margin-bottom: 0;
+}
+
+/* How It Works Section */
+.how-it-works {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.how-it-works .step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.how-it-works .step.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.how-it-works .step img {
+  max-width: 80px;
+  margin-right: 1.5rem;
+  border-radius: 8px;
+}
+
+.how-it-works h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: rgb(56, 66, 172);
+}
+
+.how-it-works p {
+  font-size: 1.125rem;
+  line-height: 1.75;
 }
 
 /* Testimonials Section */
@@ -125,4 +222,31 @@ body {
   background: #71b0f3; /* Primary color */
   color: white;
   padding: 5rem 0;
+}
+
+.cta .btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.125rem;
+  transition: background 0.3s ease;
+}
+
+.cta .btn:hover {
+  background: #555;
+}
+
+/* AOS Animations */
+[data-aos] {
+  opacity: 0;
+  transition-property: transform, opacity;
+  transition-duration: 1s;
+}
+
+[data-aos].aos-animate {
+  opacity: 1;
+}
+
+/* Flash Message Fade Out */
+.alert.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease-out;
 }

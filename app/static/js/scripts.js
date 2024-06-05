@@ -3,8 +3,7 @@ console.log("Custom scripts loaded.");
 document.addEventListener("DOMContentLoaded", function() {
     // Fetch and display average data
     fetch('/dashboard_data')
-        .then(response => {console.log('Response:', response);
-        return response.json()})
+        .then(response => response.json())
         .then(data => {
             console.log('Dashboard Data:', data);
             document.getElementById('averageSleepHours').textContent = data.avg_sleep_hours.toFixed(2) + " hours";
@@ -120,7 +119,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const ctx = document.getElementById('moodChart').getContext('2d');
             new Chart(ctx, {
                 ...chartConfig,
-                // type: 'radar',
                 data: {
                     labels: data.map(item => item.date),
                     datasets: [{
@@ -154,10 +152,26 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Example of adding dynamic behavior to elements (e.g., button click)
     document.querySelectorAll('.btn-dynamic').forEach(button => {
         button.addEventListener('click', function() {
             alert('Button clicked: ' + this.textContent);
+        });
+    });
+
+    // Flash message fade out
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.classList.add('fade-out');
+        });
+    }, 5000); // 5 seconds
+
+    // Remove the alert from the DOM after it has faded out
+    document.querySelectorAll('.alert').forEach(alert => {
+        alert.addEventListener('transitionend', () => {
+            if (alert.classList.contains('fade-out')) {
+                alert.remove();
+            }
         });
     });
 });
