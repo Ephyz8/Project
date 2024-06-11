@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(UserMixin, db.Model):
     """
     Defines a User class that inherits from db.Model, making it a model class for SQLAlchemy.
+    This class represents the users of the application.
     """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -22,15 +23,24 @@ class User(UserMixin, db.Model):
     mood_entries = db.relationship('Mood', backref='user', lazy=True)
 
     def set_password(self, password):
+        """
+        Sets the user's password to a hashed version of the provided password.
+        """
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
+        """
+        Checks if the provided password matches the hashed password stored in the database.
+        """
         return check_password_hash(self.password, password)
 
     def __repr__(self):
         return f'<User {self.username}>'
     
     def to_dict(self):
+        """
+        Returns a dictionary representation of the user object.
+        """
         return {
             'id': self.id,
             'username': self.username,
@@ -43,6 +53,10 @@ class User(UserMixin, db.Model):
         }
 
 class Activity(db.Model):
+    """
+    Defines an Activity class that inherits from db.Model, making it a model class for SQLAlchemy.
+    This class represents physical activities logged by users.
+    """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -56,6 +70,9 @@ class Activity(db.Model):
         return f'<Activity {self.type}>'
     
     def to_dict(self):
+        """
+        Returns a dictionary representation of the activity object.
+        """
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -70,6 +87,7 @@ class Activity(db.Model):
 class Nutrition(db.Model):
     """
     Defines a Nutrition class that inherits from db.Model, making it a model class for SQLAlchemy.
+    This class represents nutrition entries logged by users.
     """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -83,6 +101,9 @@ class Nutrition(db.Model):
         return f'<Nutrition {self.date}>'
 
     def to_dict(self):
+        """
+        Returns a dictionary representation of the nutrition object.
+        """
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -96,6 +117,7 @@ class Nutrition(db.Model):
 class Sleep(db.Model):
     """
     Defines a Sleep class that inherits from db.Model, making it a model class for SQLAlchemy.
+    This class represents sleep data logged by users.
     """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -107,6 +129,9 @@ class Sleep(db.Model):
         return f'<Sleep {self.date}>'
 
     def to_dict(self):
+        """
+        Returns a dictionary representation of the sleep object.
+        """
         return {
             'id': self.id,
             'user_id': self.user_id,
@@ -118,6 +143,7 @@ class Sleep(db.Model):
 class Mood(db.Model):
     """
     Defines a Mood class that inherits from db.Model, making it a model class for SQLAlchemy.
+    This class represents mood entries logged by users.
     """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -129,8 +155,10 @@ class Mood(db.Model):
         return f'<Mood {self.date}>'
 
     def to_dict(self):
+        """
+        Returns a dictionary representation of the mood object.
+        """
         return {
-            'mood': self.mood,
             'id': self.id,
             'user_id': self.user_id,
             'date': self.date,

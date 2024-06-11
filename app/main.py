@@ -11,14 +11,23 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def home():
+    """
+    Route for the home page.
+    """
     return render_template('index.html')
 
 @main.route('/about')
 def about():
+    """
+    Route for the about page.
+    """
     return render_template('about.html')
 
 @main.route('/contact', methods=['GET', 'POST'])
 def contact():
+    """
+    Route for the contact page. Handles contact form submissions.
+    """
     form = ContactForm()
     if form.validate_on_submit():
         # Process the form data
@@ -28,6 +37,9 @@ def contact():
 
 @main.route('/users', methods=['POST'])
 def create_user():
+    """
+    API route to create a new user. Expects JSON data.
+    """
     data = request.get_json()
     existing_user = User.query.filter_by(username=data['username']).first()
     existing_email = User.query.filter_by(email=data['email']).first()
@@ -46,6 +58,9 @@ def create_user():
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required
 def create_or_update_profile():
+    """
+    Route to create or update the user's profile.
+    """
     form = ProfileForm()
     if form.validate_on_submit():
         current_user.first_name = form.first_name.data
@@ -67,6 +82,9 @@ def create_or_update_profile():
 @main.route('/delete_profile', methods=['POST'])
 @login_required
 def delete_profile():
+    """
+    Route to delete the user's profile and all associated data.
+    """
     form = DeleteProfileForm()
     if form.validate_on_submit():
         user_id = current_user.id
@@ -90,6 +108,9 @@ def delete_profile():
 @main.route('/dashboard_data')
 @login_required
 def dashboard():
+    """
+    Route to display the dashboard data for the current user.
+    """
     user_id = current_user.id
 
     sleep_data = Sleep.query.filter_by(user_id=user_id).all()
@@ -115,6 +136,9 @@ def dashboard():
 @main.route('/log_sleep', methods=['GET', 'POST'])
 @login_required
 def log_sleep():
+    """
+    Route to log sleep data for the current user.
+    """
     form = SleepForm()
     if form.validate_on_submit():
         sleep = Sleep(
@@ -132,6 +156,9 @@ def log_sleep():
 @main.route('/sleep_data', methods=['GET'])
 @login_required
 def sleep_data():
+    """
+    API route to get sleep data for the current user based on the period.
+    """
     period = request.args.get('period', 'daily')
     sleeps = get_sleeps_by_period(current_user.id, period)
     sleep_data = [{
@@ -144,6 +171,9 @@ def sleep_data():
 @main.route('/log_mood', methods=['GET', 'POST'])
 @login_required
 def log_mood():
+    """
+    Route to log mood data for the current user.
+    """
     form = MoodForm()
     if request.method == 'POST' and form.validate_on_submit():
         new_mood = Mood(
@@ -161,6 +191,9 @@ def log_mood():
 @main.route('/mood_data', methods=['GET'])
 @login_required
 def mood_data():
+    """
+    API route to get mood data for the current user based on the period.
+    """
     period = request.args.get('period', 'daily')
     moods = get_moods_by_period(current_user.id, period)
     mood_data = [{
@@ -173,6 +206,9 @@ def mood_data():
 @main.route('/log_activity', methods=['GET', 'POST'])
 @login_required
 def log_activity():
+    """
+    Route to log physical activity data for the current user.
+    """
     form = ActivityForm()
     if form.validate_on_submit():
         activity = Activity(
@@ -193,6 +229,9 @@ def log_activity():
 @main.route('/activity_data', methods=['GET'])
 @login_required
 def activity_data():
+    """
+    API route to get activity data for the current user based on the period.
+    """
     period = request.args.get('period', 'daily')
     activities = get_activities_by_period(current_user.id, period)
     activity_data = [{
@@ -208,6 +247,9 @@ def activity_data():
 @main.route('/log_nutrition', methods=['GET', 'POST'])
 @login_required
 def log_nutrition():
+    """
+    Route to log nutrition data for the current user.
+    """
     form = NutritionForm()
     if form.validate_on_submit():
         nutrition = Nutrition(
@@ -224,10 +266,12 @@ def log_nutrition():
         return redirect(url_for('main.dashboard'))
     return render_template('log_nutrition.html', title='Log Nutrition', form=form)
 
-
 @main.route('/nutrition_data', methods=['GET'])
 @login_required
 def nutrition_data():
+    """
+    API route to get nutrition data for the current user based on the period.
+    """
     period = request.args.get('period', 'daily')
     nutritions = get_nutritions_by_period(current_user.id, period)
     nutrition_data = [{
@@ -240,6 +284,9 @@ def nutrition_data():
     return jsonify(nutrition_data), 200
 
 def get_activities_by_period(user_id, period):
+    """
+    Helper function to get activities based on the specified period.
+    """
     now = datetime.utcnow()
     if period == 'daily':
         start_date = now - timedelta(days=1)
@@ -252,6 +299,9 @@ def get_activities_by_period(user_id, period):
     return Activity.query.filter(Activity.user_id == user_id, Activity.date >= start_date).all()
 
 def get_nutritions_by_period(user_id, period):
+    """
+    Helper function to get nutrition data based on the specified period.
+    """
     now = datetime.utcnow()
     if period == 'daily':
         start_date = now - timedelta(days=1)
@@ -264,6 +314,9 @@ def get_nutritions_by_period(user_id, period):
     return Nutrition.query.filter(Nutrition.user_id == user_id, Nutrition.date >= start_date).all()
 
 def get_sleeps_by_period(user_id, period):
+    """
+    Helper function to get sleep data based on the specified period.
+    """
     now = datetime.utcnow()
     if period == 'daily':
         start_date = now - timedelta(days=1)
@@ -276,6 +329,9 @@ def get_sleeps_by_period(user_id, period):
     return Sleep.query.filter(Sleep.user_id == user_id, Sleep.date >= start_date).all()
 
 def get_moods_by_period(user_id, period):
+    """
+    Helper function to get mood data based on the specified period.
+    """
     now = datetime.utcnow()
     if period == 'daily':
         start_date = now - timedelta(days=1)
